@@ -136,5 +136,6 @@ void makeAdventurer(struct gameState *state, int currentPlayer, int *temphand);
 void makeSmithy(struct gameState *state, int currentPlayer, int handPos);
 void makeCouncilRoom(struct gameState *state, int currentPlayer, int handPos);
 void makeFeast(struct gameState *state, int currentPlayer, int *temphand, int choice1);
+void makeVillage(struct gameState *state, int currentPlayer, int handPos);
 
 #endif

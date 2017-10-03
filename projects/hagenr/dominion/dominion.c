@@ -709,7 +709,6 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 		    break;
 		}
 	    }
-
 	    return 0;
 
 	case remodel:
@@ -743,14 +742,15 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 	    return 0;
 
 	case village:
-	    //+1 Card
-	    drawCard(currentPlayer, state);
+	    makeVillage(state, currentPlayer, handPos);
+	    /* //+1 Card */
+	    /* drawCard(currentPlayer, state); */
 
-	    //+2 Actions
-	    state->numActions = state->numActions + 2;
+	    /* //+2 Actions */
+	    /* state->numActions = state->numActions + 2; */
 
-	    //discard played card from hand
-	    discardCard(handPos, currentPlayer, state, 0);
+	    /* //discard played card from hand */
+	    /* discardCard(handPos, currentPlayer, state, 0); */
 	    return 0;
 
 	case baron:
@@ -1346,5 +1346,16 @@ void makeFeast(struct gameState *state, int currentPlayer, int *temphand, int ch
     //Reset Hand
 }
 
-    //end of dominion.c
+void makeVillage(struct gameState *state, int currentPlayer, int handPos) {
+    //+1 Card
+    drawCard(currentPlayer, state);
+
+    //+2 Actions
+    state->numActions = state->numActions + 2;
+
+    //discard played card from hand
+    discardCard(handPos, currentPlayer, state, 0);
+}
+
+//end of dominion.c
 
