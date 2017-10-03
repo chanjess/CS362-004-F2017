@@ -128,12 +128,13 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state);
 /* Set array position of each player who won (remember ties!) to
    1, others to 0 */
 
-/* 'refactored' methods for assignment 2
+/* 'refactored' five methods for assignment 2
  * transfers the card implementation logic from switch statement in cardEffects
  * to their own functions
  */
 void makeAdventurer(struct gameState *state, int currentPlayer, int *temphand);
 void makeSmithy(struct gameState *state, int currentPlayer, int handPos);
 void makeCouncilRoom(struct gameState *state, int currentPlayer, int handPos);
+void makeFeast(struct gameState *state, int currentPlayer, int *temphand, int choice1);
 
 #endif
