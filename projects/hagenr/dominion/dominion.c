@@ -1289,7 +1289,7 @@ void makeFeast(struct gameState *state, int currentPlayer, int *temphand, int ch
     //Backup hand
     int i, x;
 
-    for (i = 0; i <= state->handCount[currentPlayer]; i++){
+    for (i = 0; i < state->handCount[currentPlayer]; i++){
 	temphand[i] = state->hand[currentPlayer][i];//Backup card
 	state->hand[currentPlayer][i] = -1;//Set to nothing
     }
@@ -1298,7 +1298,7 @@ void makeFeast(struct gameState *state, int currentPlayer, int *temphand, int ch
     //Update Coins for Buy
     updateCoins(currentPlayer, state, 5);
     x = 1;//Condition to loop on
-    while( x == 1) {//Buy one card
+    while( x != 1) {//Buy one card
 	if (supplyCount(choice1, state) <= 0){
 	    if (DEBUG)
 		printf("None of that card left, sorry!\n");
