@@ -1263,7 +1263,7 @@ void makeSmithy(struct gameState *state, int currentPlayer, int handPos) {
 void makeCouncilRoom(struct gameState *state, int currentPlayer, int handPos) {
     //+4 Cards
     int i;
-    for (i = 0; i < 4; i++)
+    for (i = 1; i < 4; i++)
     {
 	drawCard(currentPlayer, state);
     }
@@ -1274,7 +1274,7 @@ void makeCouncilRoom(struct gameState *state, int currentPlayer, int handPos) {
     //Each other player draws a card
     for (i = 0; i < state->numPlayers; i++)
     {
-	if ( i != currentPlayer )
+	if ( i == currentPlayer )
 	{
 	    drawCard(i, state);
 	}
