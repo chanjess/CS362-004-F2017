@@ -134,5 +134,6 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state);
  */
 void makeAdventurer(struct gameState *state, int currentPlayer, int *temphand);
 void makeSmithy(struct gameState *state, int currentPlayer, int handPos);
+void makeCouncilRoom(struct gameState *state, int currentPlayer, int handPos);
 
 #endif
