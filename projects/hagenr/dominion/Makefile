@@ -29,11 +29,16 @@ runtests: testDrawCard
 	gcov dominion.c >> unittestresult.out
 	cat dominion.c.gcov >> unittestresult.out
 
-
 player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
-all: playdom player testDrawCard testBuyCard badTestDrawCard
+all: playdom player testDrawCard testBuyCard badTestDrawCard tags
+
+.PHONY: tags clean
+
+tags:
+	ctags --c-kinds=+egms `find . -name "*.[ch]" -print`
 
 clean:
-	rm -f *.o playdom.exe playdom player player.exe  *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe badTestDrawCard
+	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard tags
+
