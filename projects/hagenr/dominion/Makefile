@@ -1,4 +1,4 @@
-FLAGS = -Wall -fpic -coverage -lm
+CFLAGS = -Wall -fpic -coverage -lm
 
 rngs.o: rngs.h rngs.c
 	gcc -c rngs.c -g  $(CFLAGS)
@@ -24,7 +24,7 @@ unittest1: unittest1.c dominion.o rngs.o
 unittest2: unittest2.c dominion.o rngs.o
 	gcc -o unittest2 -g unittest2.c dominion.o rngs.o $(CFLAGS)
 
-unittestresults.out: unittest1 unittest2 playdom player
+unittestresults.out: unittest1 unittest2 dominion.o rngs.o
 	@echo "unit tests starting"
 
 	@echo "Dominion Unit Test Results" > unittestresults.out

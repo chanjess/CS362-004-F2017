@@ -15,15 +15,20 @@
  * value: 0     2      5     8        0      3      6    6          5            4     4       5    4       4      3       4     3          5      3       5       3          4        2       5       4        4       4
  * test passes if the getCost function returns the expected value, otherwise the test fails and reports the first mismatched card
  */
+
+int getCost(int);
+
 int main (int argc, char** argv) {
     int costs[] = { 0,2,5,8,0,3,6,6,5,4,4,5,4,4,3,4,3,5,3,5,3,4,2,5,4,4,4 };
     int expected, actual, i;
     int numberCards = treasure_map + 1;
     int mismatch = 0;
 
+    printf("test suite for getCost\n");
+
     for (i = 0; i < numberCards; i++) {
-	expected = getCost(i);
-	actual = costs[i];
+	actual = getCost(i);
+	expected = costs[i];
 	if (expected != actual) {
 	    mismatch = 1;
 	    break;
@@ -34,6 +39,15 @@ int main (int argc, char** argv) {
 	printf("test 1: FAIL for card number %d, expected %d but actual value is %d\n", i, expected, actual);
     } else {
 	printf("test 1: PASS for all cards\n");
+    }
+
+    i = 99;
+    actual = getCost(i);
+    expected = -1;
+    if (expected != actual) {
+	printf("test 2: FAIL for invalid card number %d, expected %d but actual value is %d\n", i, expected, actual);
+    } else {
+	printf("test 2: PASS for invalid card number\n");
     }
 
     return 0;
