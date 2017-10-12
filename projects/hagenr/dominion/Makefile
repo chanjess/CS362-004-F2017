@@ -1,4 +1,4 @@
-CFLAGS = -Wall -fpic -coverage -lm
+FLAGS = -Wall -fpic -coverage -lm
 
 rngs.o: rngs.h rngs.c
 	gcc -c rngs.c -g  $(CFLAGS)
@@ -19,9 +19,12 @@ testBuyCard: testDrawCard.c dominion.o rngs.o
 	gcc -o testDrawCard -g  testDrawCard.c dominion.o rngs.o $(CFLAGS)
 
 unittest1: unittest1.c dominion.o rngs.o
-	gcc -o unittest1 -g  unittest1.c dominion.o rngs.o $(CFLAGS)
+	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)
 
-unittestresults.out: unittest1 playdom player
+unittest2: unittest2.c dominion.o rngs.o
+	gcc -o unittest2 -g unittest2.c dominion.o rngs.o $(CFLAGS)
+
+unittestresults.out: unittest1 unittest2 playdom player
 	@echo "unit tests starting"
 
 	@echo "Dominion Unit Test Results" > unittestresults.out
@@ -29,6 +32,10 @@ unittestresults.out: unittest1 playdom player
 
 	@echo "unittest1.c" >> unittestresults.out
 	@./unittest1 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
+	@echo "unittest2.c" >> unittestresults.out
+	@./unittest2 >> unittestresults.out
 	@gcov dominion.c >> unittestresults.out
 
 	@echo "unit tests complete"
@@ -47,7 +54,7 @@ runtests: testDrawCard
 player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
-all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 tags
+all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 tags
 
 .PHONY: tags clean
 
@@ -55,5 +62,4 @@ tags:
 	ctags --c-kinds=+egms `find . -name "*.[ch]" -print`
 
 clean:
-	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard tags
-
+	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard unittest1 unittest2 tags
