@@ -11,6 +11,7 @@
  *   else returns -1 if invalid card number
  * test setup: use values from http://wiki.dominionstrategy.com/index.php/List_of_cards
  *   to create an array where indexes are parallel to the CARD enum with card values
+ *
  * card:  curse estate duchy province copper silver gold adventurer council_room feast gardens mine remodel smithy village baron great_hall minion steward tribute ambassador cutpurse embargo outpost salvager sea_hag treasure_map
  * index: 0     1      2     3        4      5      6    7          8            9     10      11   12      13     14      15    16         17     18      19      20         21       22      23      24       25      26
  * value: 0     2      5     8        0      3      6    6          5            4     4       5    4       4      3       4     3          5      3       5       3          4        2       5       4        4       4

@@ -12,11 +12,11 @@
  *    3 or more empty supply piles
  * else returns 0 (false)
  * test setup: initialize an empty gameState struct with one of each card
- *   test 1: should return 0 - there's one province card and one card in each pile
- *   test 2: remove province card. should return 1 since there's no province card
- *           but one card in each pile
- *   test 3: add province card, set 3 piles to zero. should return 1 since there
- *           are 3 card piles empty, but 1 province card
+ * test 1: should return 0 - there's one province card and one card in each pile
+ * test 2: remove province card. should return 1 since there's no province card
+ *         but one card in each pile
+ * test 3: add province card, set 3 piles to zero. should return 1 since there
+ *         are 3 card piles empty, but 1 province card
  */
 int main (int argc, char** argv) {
     struct gameState g;
