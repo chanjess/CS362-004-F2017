@@ -76,4 +76,4 @@ tags:
 	ctags --c-kinds=+egms `find . -name "*.[ch]" -print`
 
 clean:
-	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard unittest1 unittest2 tags
+	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard unittest1 unittest2 unittest3 unittest4 tags
