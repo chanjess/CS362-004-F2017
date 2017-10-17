@@ -23,37 +23,230 @@
  *           updateCoins with bonus of 1. coins should be 2 + 2 + 3 + 1 = 8
  */
 
+struct cardCounts {
+    int curses;
+    int estates;
+    int duchies;
+    int provinces;
+    int great_halls;
+    int gardens;
+};
+
+struct gameState playGame(int randomSeed);
+int getScore(int player, struct gameState *state);
+int calcScore(int player, int cardCount, int cards[], int numCards);
+
+int getScores(int player, struct gameState *state);
+void getCardCounts(int player, int cardCount, int cards[], struct cardCounts *myDeck);
+
 int main (int argc, char** argv) {
-    struct gameState g;
-    int numPlayers = 2;
-    int playerNum = 0;
-    int seed = 10;
-    int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
-	sea_hag, tribute, smithy};
-    int bonus = 0;
-    int actual, expected;
+    struct gameState results;
+    int randomSeed = 2;
+    results = playGame(randomSeed);
+    printf("Player 0: %d\nPlayer 1: %d\n", scoreFor(0, &results), scoreFor(1, &results));
+    printf("P0: %d P1: %d\n", getScore(0, &results), getScore(1, &results));
+    printf("P0: %d P1: %d\n", getScores(0, &results), getScores(1, &results));
+    /* printf("p0 discards: %d, deck: %d, hand: %d\n", results.discardCount[0], results.deckCount[0], results.deckCount[0]); */
+    /* printf("p1 discards: %d, deck: %d, hand: %d\n", results.discardCount[1], results.deckCount[1], results.deckCount[1]); */
 
-    /* initialize 2 player game with seed 10 */
-    initializeGame(numPlayers, k, seed, &g);
-
-    printf("test suite for updateCoins\n");
-    printf("test 1: ");
-    expected = 4;
-    updateCoins(playerNum, &g, bonus);
-    actual = g.coins;
-    printf("%s", (actual == expected) ? "PASS" : "FAIL");
-    printf(" - should have 4 coins for initial hand\n");
-    
-    /* change player 0 hand. now has 1 gold, 1 silver, 2 copper. give 1 bonus */
-    g.hand[playerNum][0] = gold;
-    g.hand[playerNum][1] = silver;
-    bonus = 1;
-
-    printf("test 2: ");
-    expected = 8;
-    updateCoins(playerNum, &g, bonus);
-    actual = g.coins;
-    printf("%s", (actual == expected) ? "PASS" : "FAIL");
-    printf(" - should have 8 coins for second hand\n");
     return 0;
 }
+
+// silent game play
+struct gameState playGame(int randomSeed) {
+    struct gameState G;
+    int k[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
+	sea_hag, tribute, smithy};
+
+    initializeGame(2, k, randomSeed, &G);
+
+    int money = 0;
+    int smithyPos = -1;
+    int adventurerPos = -1;
+    int i=0;
+
+    int numSmithies = 0;
+    int numAdventurers = 0;
+
+    while (!isGameOver(&G)) {
+	money = 0;
+	smithyPos = -1;
+	adventurerPos = -1;
+	for (i = 0; i < numHandCards(&G); i++) {
+	    if (handCard(i, &G) == copper)
+		money++;
+	    else if (handCard(i, &G) == silver)
+		money += 2;
+	    else if (handCard(i, &G) == gold)
+		money += 3;
+	    else if (handCard(i, &G) == smithy)
+		smithyPos = i;
+	    else if (handCard(i, &G) == adventurer)
+		adventurerPos = i;
+	}
+
+	if (whoseTurn(&G) == 0) {
+	    if (smithyPos != -1) {
+		playCard(smithyPos, -1, -1, -1, &G);
+		money = 0;
+		i=0;
+		while(i<numHandCards(&G)){
+		    if (handCard(i, &G) == copper){
+			playCard(i, -1, -1, -1, &G);
+			money++;
+		    }
+		    else if (handCard(i, &G) == silver){
+			playCard(i, -1, -1, -1, &G);
+			money += 2;
+		    }
+		    else if (handCard(i, &G) == gold){
+			playCard(i, -1, -1, -1, &G);
+			money += 3;
+		    }
+		    i++;
+		}
+	    }
+
+	    if (money >= 8) {
+		buyCard(province, &G);
+	    }
+	    else if (money >= 6) {
+		buyCard(gold, &G);
+	    }
+	    else if ((money >= 4) && (numSmithies < 2)) {
+		buyCard(smithy, &G);
+		numSmithies++;
+	    }
+	    else if (money >= 3) {
+		buyCard(silver, &G);
+	    }
+
+	    endTurn(&G);
+	}
+	else {
+	    if (adventurerPos != -1) {
+		playCard(adventurerPos, -1, -1, -1, &G);
+		money = 0;
+		i=0;
+		while(i<numHandCards(&G)){
+		    if (handCard(i, &G) == copper){
+			playCard(i, -1, -1, -1, &G);
+			money++;
+		    }
+		    else if (handCard(i, &G) == silver){
+			playCard(i, -1, -1, -1, &G);
+			money += 2;
+		    }
+		    else if (handCard(i, &G) == gold){
+			playCard(i, -1, -1, -1, &G);
+			money += 3;
+		    }
+		    i++;
+		}
+	    }
+
+	    if (money >= 8) {
+		buyCard(province, &G);
+	    }
+	    else if ((money >= 6) && (numAdventurers < 2)) {
+		buyCard(adventurer, &G);
+		numAdventurers++;
+	    }else if (money >= 6){
+		buyCard(gold, &G);
+	    }
+	    else if (money >= 3){
+		buyCard(silver, &G);
+	    }
+
+	    endTurn(&G);
+	}
+    }
+
+    return G;
+}
+
+int getScores(int player, struct gameState *state) {
+    int score = 0;
+    int numCards = fullDeckCount(player, 0, state);
+    int gardenBonus = numCards / 10;
+    struct cardCounts myDeck = {0, 0, 0, 0, 0, 0};
+
+    getCardCounts(player, state->handCount[player], state->hand[player], &myDeck);
+    getCardCounts(player, state->discardCount[player], state->discard[player], &myDeck);
+    /* getCardCounts(player, state->deckCount[player], state->deck[player], &myDeck); */
+    /* comment out previous line, uncomment out next line to verify functions get same _wrong_ score */
+    getCardCounts(player, state->discardCount[player], state->deck[player], &myDeck);
+    score -= (myDeck.curses);
+    score += (myDeck.estates);
+    score += (myDeck.great_halls);
+    score += (myDeck.duchies * 3);
+    score += (myDeck.provinces * 6);
+    score += (myDeck.gardens * gardenBonus);
+    return score;
+}
+
+void getCardCounts(int player, int cardCount, int cards[], struct cardCounts *myDeck) {
+    int i;
+    
+    for (i = 0; i < cardCount; i++) {
+	switch (cards[i]) {
+	    case curse:
+		myDeck->curses++;
+		break;
+	    case estate:
+		myDeck->estates++;
+		break;
+	    case great_hall:
+		myDeck->great_halls++;
+		break;
+	    case duchy:
+		myDeck->duchies++;
+		break;
+	    case province:
+		myDeck->provinces++;
+		break;
+	    case gardens:
+		myDeck->gardens++;
+		break;
+	}
+    }
+}
+
+int getScore(int player, struct gameState *state) {
+    int score = 0;
+    int numCards = fullDeckCount(player, 0, state);
+    score = calcScore(player, state->handCount[player], state->hand[player], numCards);
+    score += calcScore(player, state->discardCount[player], state->discard[player], numCards);
+    score += calcScore(player, state->deckCount[player], state->deck[player], numCards);
+    /* comment out previous line, uncomment out next line to verify functions get same _wrong_ score */
+    /* score += calcScore(player, state->discardCount[player], state->deck[player], numCards); */
+    return score;
+}
+
+int calcScore(int player, int cardCount, int cards[], int numCards) {
+    int i;
+    int score = 0;
+    
+    for (i = 0; i < cardCount; i++) {
+	switch (cards[i]) {
+	    case curse:
+		score -= 1;
+		break;
+	    case estate:
+	    case great_hall:
+		score += 1;
+		break;
+	    case duchy:
+		score += 3;
+		break;
+	    case province:
+		score += 6;
+		break;
+	    case gardens:
+		score += (numCards / 10);
+		break;
+	}
+    }
+    return score;
+}
+
