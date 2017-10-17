@@ -17,8 +17,6 @@
  * test passes if the getCost function returns the expected value, otherwise the test fails and reports the first mismatched card
  */
 
-/* int getCost(int); */
-
 int main (int argc, char** argv) {
     int costs[] = { 0,2,5,8,0,3,6,6,5,4,4,5,4,4,3,4,3,5,3,5,3,4,2,5,4,4,4 };
     int expected, actual, i;

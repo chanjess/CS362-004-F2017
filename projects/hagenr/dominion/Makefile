@@ -41,6 +41,10 @@ unittestresults.out: unittest1 unittest2 dominion.o rngs.o
 	@./unittest2 >> unittestresults.out
 	@gcov dominion.c >> unittestresults.out
 
+	@echo "unittest3.c" >> unittestresults.out
+	@./unittest3 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
 	@echo "unit tests complete"
 
 testAll: dominion.o testSuite.c
