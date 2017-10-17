@@ -202,7 +202,6 @@ int getScores(int player, struct gameState *state) {
 // count the number of victory cards in a player's deck
 void getCardCounts(int player, int cardCount, int cards[], struct cardCounts *myDeck) {
     int i;
-    
     for (i = 0; i < cardCount; i++) {
 	switch (cards[i]) {
 	    case curse:
