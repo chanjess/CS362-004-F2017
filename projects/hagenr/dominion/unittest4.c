@@ -204,13 +204,15 @@ int getScores(int player, struct gameState *state) {
     getCardCounts(player, state->handCount[player], state->hand[player], &myDeck);
     getCardCounts(player, state->discardCount[player], state->discard[player], &myDeck);
     getCardCounts(player, state->deckCount[player], state->deck[player], &myDeck);
-    /* comment out previous line, uncomment out next line to verify test functions get _wrong_ score */
+    /* comment out previous line and */
+    /* comment out next line to verify test functions get _wrong_ score */
     /* getCardCounts(player, state->discardCount[player], state->deck[player], &myDeck); */
 
     // calc garden points
-    int numCards = myDeck.curses + myDeck.estates + myDeck.great_halls + myDeck.duchies + myDeck.provinces + myDeck.gardens;
+    int numCards = myDeck.curses + myDeck.estates + myDeck.great_halls + 
+	myDeck.duchies + myDeck.provinces + myDeck.gardens;
     int gardenBonus = (int)floor((float)numCards / 10);
-    /* there may be another issue to test, uncomment out the next 2 lines */
+    /* there may be another issue to test, to see the error uncomment out the next 2 lines */
     /* printf("numCards: %d, gardenBonus: %d\n", numCards, gardenBonus); */
     /* printf("deckCount: %d\n", fullDeckCount(player, 0, state)); */
 
