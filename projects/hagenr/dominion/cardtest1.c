@@ -30,35 +30,50 @@ int main (int argc, char** argv) {
     int numPlayers = 2;
     int playerOne = 0;
     int playerTwo = 1;
-    int handpos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
+    int handPos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
     int seed = 10;
     int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
 	sea_hag, tribute, smithy};
 
+    int i;
+    int mismatch = 0;
+
     /* initialize 2 player game with seed 10 */
     initializeGame(numPlayers, k, seed, &pre);
+
+    /* pre.hand[playerOne][0] = smithy; */
 
     /* copy the game state, use post for testing, and compare to pre */
     post = pre;
 
     printf("test suite for smithy\n");
     printf("test 1: ");
-    /* int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState *state, int handPos, int *bonus) */
-    cardEffect(smithy, choice1, choice2, choice3, &post, handPos, &bonus); 
+    /* printf("before cardEffect hand count pre: %d, post: %d\n", pre.handCount[playerOne], post.handCount[playerOne]); */
+    /* cardEffect(int card, int choice1, int choice2, int choice3, struct gameState *state, int handPos, int *bonus) */
+    cardEffect(smithy, choice1, choice2, choice3, &post, handPos, &bonus);
+    printf("hand count pre: %d, post: %d\n", pre.handCount[playerOne], post.handCount[playerOne]);
+    printf("played card count pre: %d, post: %d\n", pre.playedCardCount, post.playedCardCount);
+    printf("deck count pre: %d, post: %d\n", pre.deckCount[playerOne], post.deckCount[playerOne]);
+    printf("coin count pre: %d, post: %d\n", pre.coins, post.coins);
+    endTurn(&post);
+    printf("discard count pre: %d, post: %d\n", pre.discardCount[playerOne], post.discardCount[playerOne]);
+    printf("deck count pre: %d, post: %d\n", pre.deckCount[playerOne], post.deckCount[playerOne]);
+    for (i = 0; i < treasure_map + 1; i++) {
+	if (pre.supplyCount[i] != post.supplyCount[i]) {
+	    mismatch = 1;
+	    break;
+	}
+    }
+    if (mismatch) {
+	printf("supply counts don't match: %d\n", i);
+    } else {
+	printf("supply counts match\n");
+    }
 
-    printf("%s", (actual == expected) ? "PASS" : "FAIL");
-    printf(" - should have 4 coins for initial hand\n");
-    
-    /* change player 0 hand. now has 1 gold, 1 silver, 2 copper. give 1 bonus */
-    g.hand[playerNum][0] = gold;
-    g.hand[playerNum][1] = silver;
-    bonus = 1;
 
-    printf("test 2: ");
-    expected = 8;
-    updateCoins(playerNum, &g, bonus);
-    actual = g.coins;
-    printf("%s", (actual == expected) ? "PASS" : "FAIL");
-    printf(" - should have 8 coins for second hand\n");
+    /* printf("%s", (actual == expected) ? "PASS" : "FAIL"); */
+    /* printf(" - should have 4 coins for initial hand\n"); */
+
+
     return 0;
 }
