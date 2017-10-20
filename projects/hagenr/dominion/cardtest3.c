@@ -10,15 +10,17 @@
  * NOTE: test setup influenced by the steward sample test case from instructor
  *
  * test suite for the council room
- * card behavior: 
+ * card behavior: draw 4 cards, get 1 more buy, other player(s) get to draw card
  * test setup: call initializeGame with 2 players, random seed of 10.
  * tests
- *   player 1 deck has 3 fewer cards
- *   player 1 hand has 2 more cards
+ *   player 1 deck has 4 fewer cards
+ *   player 1 hand has 3 more cards
  *   player 1 played 1 card
- *   player 2 deck unchanged
- *   coins are unchanged
  *   player 1 discards 7 cards
+ *   player 1 has an extra buy
+ *   player 2 deck has 1 fewer card
+ *   player 2 hand has 1 more card
+ *   coins are unchanged
  *   supply pile counts are unchanged
  */
 
@@ -29,6 +31,7 @@ int main (int argc, char** argv) {
     int numPlayers = 2;
     int playerOne = 0;
     int playerTwo = 1;
+    /* not sure what the choices should be for council room, 0 makes sense */
     int handPos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
     int seed = 10;
     int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
@@ -37,8 +40,10 @@ int main (int argc, char** argv) {
     int i;
     int expected, actual;
     int mismatch = 0;
-    int numNewCardsInHand = 3;
+    int numNewCardsInHand = 4;
     int numPlayedCards = 1;
+    int numExtraBuys = 1;
+    int numNewCardsInOtherHand = 1;
 
     /* initialize 2 player game with seed 10 */
     initializeGame(numPlayers, k, seed, &pre);
@@ -46,8 +51,8 @@ int main (int argc, char** argv) {
     /* copy the game state, use post for testing, and compare to pre */
     post = pre;
 
-    printf("test suite for playing smithy\n");
-    cardEffect(smithy, choice1, choice2, choice3, &post, handPos, &bonus);
+    printf("test suite for playing council room\n");
+    cardEffect(council_room, choice1, choice2, choice3, &post, handPos, &bonus);
 
     expected = pre.handCount[playerOne] + numNewCardsInHand - numPlayedCards;
     actual = post.handCount[playerOne];
@@ -61,9 +66,17 @@ int main (int argc, char** argv) {
     actual = post.playedCardCount;
     printResult(expected, actual, "Player 1 played card count");
 
-    expected = pre.deckCount[playerTwo];
+    expected = pre.numBuys + numExtraBuys;
+    actual = post.numBuys;
+    printResult(expected, actual, "Player 1 number of buys");
+
+    expected = pre.deckCount[playerTwo] - numNewCardsInOtherHand;
     actual = post.deckCount[playerTwo];
     printResult(expected, actual, "Player 2 deck count");
+
+    expected = pre.handCount[playerTwo] + numNewCardsInOtherHand;
+    actual = post.handCount[playerTwo];
+    printResult(expected, actual, "Player 2 hand count");
 
     expected = pre.coins;
     actual = post.coins;
