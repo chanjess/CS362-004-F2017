@@ -6,11 +6,12 @@
 #include "rngs.h"
 
 /*
- * NOTE: card behavior based on module notes from the instructor.
+ * NOTE: card behavior based on module notes from the instructor and the wiki
+ *   http://wiki.dominionstrategy.com/index.php/Smithy
  * NOTE: test setup influenced by the steward sample test case from instructor
  *
  * test suite for the smithy card
- * card behavior: player discards the smithy and adds three cards from their 
+ * card behavior: play the smithy card and add three cards from their 
  *   deck to their hand. no changes to state of other player and no changes in
  *   the number of cards in the supply piles. 
  * test setup: call initializeGame with 2 players, random seed of 10.
@@ -21,7 +22,7 @@
  *   player 2 deck unchanged
  *   coins are unchanged
  *   player 1 discards 7 cards
- *   supply pile counjs are unchanged
+ *   supply pile counts are unchanged
  */
 
 void printResult(int expected, int actual, char *tmp);
@@ -31,7 +32,8 @@ int main (int argc, char** argv) {
     int numPlayers = 2;
     int playerOne = 0;
     int playerTwo = 1;
-    int handPos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
+    /* set args for card effect per line 43 in playdom.c */
+    int handPos = 0, choice1 = -1, choice2 = -1, choice3 = -1, bonus = 0;
     int seed = 10;
     int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
 	sea_hag, tribute, smithy};

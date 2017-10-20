@@ -6,7 +6,8 @@
 #include "rngs.h"
 
 /*
- * NOTE: card behavior based on module notes from the instructor.
+ * NOTE: card behavior based on module notes from the instructor and the wiki
+ *   http://wiki.dominionstrategy.com/index.php/
  * NOTE: test setup influenced by the steward sample test case from instructor
  *
  * test suite for the 

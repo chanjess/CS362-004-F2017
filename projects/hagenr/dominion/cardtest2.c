@@ -6,20 +6,23 @@
 #include "rngs.h"
 
 /*
- * NOTE: card behavior based on module notes from the instructor.
+ * NOTE: card behavior based on module notes from the instructor and the wiki
+ *   http://wiki.dominionstrategy.com/index.php/Adventurer
  * NOTE: test setup influenced by the steward sample test case from instructor
  *
- * test suite for the 
- * card behavior: 
+ * test suite for the adventurer card
+ * card behavior: play the adventurer card. keep revealing cards from your deck
+ *   until you find 2 treasure cards, which you add to your hand. discard the
+ *   other revealed cards
  * test setup: call initializeGame with 2 players, random seed of 10.
  * tests
- *   player 1 deck has 3 fewer cards
+ *   player 1 deck has x fewer cards
  *   player 1 hand has 2 more cards
  *   player 1 played 1 card
  *   player 2 deck unchanged
  *   coins are unchanged
  *   player 1 discards 7 cards
- *   supply pile counjs are unchanged
+ *   supply pile counts are unchanged
  */
 
 void printResult(int expected, int actual, char *tmp);
@@ -29,7 +32,8 @@ int main (int argc, char** argv) {
     int numPlayers = 2;
     int playerOne = 0;
     int playerTwo = 1;
-    int handPos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
+    /* set args for card effect per line 88 in playdom.c */
+    int handPos = 0, choice1 = -1, choice2 = -1, choice3 = -1, bonus = 0;
     int seed = 10;
     int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
 	sea_hag, tribute, smithy};
@@ -37,7 +41,7 @@ int main (int argc, char** argv) {
     int i;
     int expected, actual;
     int mismatch = 0;
-    int numNewCardsInHand = 3;
+    int numNewCardsInHand = 2;
     int numPlayedCards = 1;
 
     /* initialize 2 player game with seed 10 */
@@ -46,16 +50,16 @@ int main (int argc, char** argv) {
     /* copy the game state, use post for testing, and compare to pre */
     post = pre;
 
-    printf("test suite for playing smithy\n");
-    cardEffect(smithy, choice1, choice2, choice3, &post, handPos, &bonus);
+    printf("test suite for playing adventurer\n");
+    cardEffect(adventurer, choice1, choice2, choice3, &post, handPos, &bonus);
 
     expected = pre.handCount[playerOne] + numNewCardsInHand - numPlayedCards;
     actual = post.handCount[playerOne];
     printResult(expected, actual, "Player 1 hand count");
 
-    expected = pre.deckCount[playerOne] - numNewCardsInHand;
-    actual = post.deckCount[playerOne];
-    printResult(expected, actual, "Player 1 deck count");
+    /* expected = pre.deckCount[playerOne] - numNewCardsInHand; */
+    /* actual = post.deckCount[playerOne]; */
+    /* printResult(expected, actual, "Player 1 deck count"); */
 
     expected = pre.playedCardCount + numPlayedCards;
     actual = post.playedCardCount;
