@@ -13,13 +13,13 @@
  *   until you find 2 treasure cards, which you add to your hand. discard the
  *   other revealed cards
  * test setup: call initializeGame with 2 players, random seed of 10.
- * tests
- *   player 1 deck has x fewer cards
- *   player 1 hand has 2 more cards
- *   player 1 played 1 card
- *   player 2 deck unchanged
+ * 2 tests, one for each player (player 1 is 'player', player 2 is 'opponent'):
+ *   player deck has x fewer cards - no visibility into this metric
+ *   player hand has 1 more cards
+ *   player played 1 card
+ *   opponent deck unchanged
  *   coins are unchanged
- *   player 1 discards 7 cards
+ *   player discards 7 cards
  *   supply pile counts are unchanged
  */
 
@@ -28,8 +28,6 @@ void printResult(int expected, int actual, char *tmp);
 int main (int argc, char** argv) {
     struct gameState pre, post;
     int numPlayers = 2;
-    int playerOne = 0;
-    int playerTwo = 1;
     /* set args for card effect per line 88 in playdom.c */
     int handPos = 0, choice1 = -1, choice2 = -1, choice3 = -1, bonus = 0;
     int seed = 10;
@@ -41,6 +39,7 @@ int main (int argc, char** argv) {
     int mismatch = 0;
     int numNewCardsInHand = 2;
     int numPlayedCards = 1;
+    int playerCount;
 
     /* initialize 2 player game with seed 10 */
     initializeGame(numPlayers, k, seed, &pre);
@@ -49,46 +48,47 @@ int main (int argc, char** argv) {
     post = pre;
 
     printf("test suite for playing adventurer\n");
-    cardEffect(adventurer, choice1, choice2, choice3, &post, handPos, &bonus);
+    for (playerCount = 0; playerCount < numPlayers; playerCount++) {
+	cardEffect(adventurer, choice1, choice2, choice3, &post, handPos, &bonus);
 
-    expected = pre.handCount[playerOne] + numNewCardsInHand - numPlayedCards;
-    actual = post.handCount[playerOne];
-    printResult(expected, actual, "Player 1 hand count");
+	printf("\ntest results for player %d\n", playerCount+1);
+	expected = pre.handCount[playerCount] + numNewCardsInHand - numPlayedCards;
+	actual = post.handCount[playerCount];
+	printResult(expected, actual, "Player hand count");
 
-    /* expected = pre.deckCount[playerOne] - numNewCardsInHand; */
-    /* actual = post.deckCount[playerOne]; */
-    /* printResult(expected, actual, "Player 1 deck count"); */
+	expected = pre.playedCardCount + numPlayedCards;
+	actual = post.playedCardCount;
+	printResult(expected, actual, "Player played card count");
 
-    expected = pre.playedCardCount + numPlayedCards;
-    actual = post.playedCardCount;
-    printResult(expected, actual, "Player 1 played card count");
+	expected = playerCount == 1 ? 
+	    pre.deckCount[1-playerCount] - numNewCardsInHand :
+	    pre.deckCount[1-playerCount];
+	actual = post.deckCount[1-playerCount];
+	printResult(expected, actual, "Opponent deck count");
 
-    expected = pre.deckCount[playerTwo];
-    actual = post.deckCount[playerTwo];
-    printResult(expected, actual, "Player 2 deck count");
+	expected = pre.coins;
+	actual = post.coins;
+	printResult(expected, actual, "Coin count");
 
-    expected = pre.coins;
-    actual = post.coins;
-    printResult(expected, actual, "Coin count");
+	/* have to call endTurn to actually discard */
+	expected = numNewCardsInHand + pre.handCount[playerCount] - numPlayedCards;
+	endTurn(&post);
+	endTurn(&pre);
+	actual = post.discardCount[playerCount];
+	printResult(expected, actual, "Player discard count");
 
-    endTurn(&post);
-
-    expected = numNewCardsInHand + pre.handCount[playerOne] - numPlayedCards;
-    actual = post.discardCount[playerOne];
-    printResult(expected, actual, "Player 1 discard count");
-
-    for (i = 0; i < treasure_map + 1; i++) {
-	if (pre.supplyCount[i] != post.supplyCount[i]) {
-	    mismatch = 1;
-	    break;
+	for (i = 0; i < treasure_map + 1; i++) {
+	    if (pre.supplyCount[i] != post.supplyCount[i]) {
+		mismatch = 1;
+		break;
+	    }
+	}
+	if (!mismatch) {
+	    printf("PASSED: Supply counts unchanged\n");
+	} else {
+	    printf("FAILED: Supply counts don't match at card %d\n", i);
 	}
     }
-    if (!mismatch) {
-	printf("PASSED: Supply counts unchanged\n");
-    } else {
-	printf("FAILED: Supply counts don't match at card %d\n", i);
-    }
-
     return 0;
 }
 

@@ -13,7 +13,7 @@
  *   deck to their hand. no changes to state of other player and no changes in
  *   the number of cards in the supply piles. 
  * test setup: call initializeGame with 2 players, random seed of 10.
- * 2 tests, one for each player:
+ * 2 tests, one for each player (player 1 is 'player', player 2 is 'opponent'):
  *   player deck has 3 fewer cards
  *   player hand has 2 more cards
  *   player played 1 card
