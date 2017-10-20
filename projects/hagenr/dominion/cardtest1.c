@@ -1,8 +1,6 @@
 #include "dominion.h"
 #include "dominion_helpers.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "rngs.h"
 
 /*
@@ -79,7 +77,6 @@ int main (int argc, char** argv) {
     actual = post.discardCount[playerOne];
     printResult(expected, actual, "Player 1 discard count");
 
-    printf("Supply counts: ");
     for (i = 0; i < treasure_map + 1; i++) {
 	if (pre.supplyCount[i] != post.supplyCount[i]) {
 	    mismatch = 1;
@@ -87,7 +84,7 @@ int main (int argc, char** argv) {
 	}
     }
     if (!mismatch) {
-	printf("PASSED\n");
+	printf("PASSED: Supply counts unchanged\n");
     } else {
 	printf("FAILED: Supply counts don't match at card %d\n", i);
     }

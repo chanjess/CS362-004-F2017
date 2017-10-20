@@ -1,17 +1,15 @@
 #include "dominion.h"
 #include "dominion_helpers.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "rngs.h"
 
 /*
  * NOTE: card behavior based on module notes from the instructor.
  * NOTE: card behavior based on module notes from the instructor and the wiki
- *   http://wiki.dominionstrategy.com/index.php/
+ *   http://wiki.dominionstrategy.com/index.php/Council_Room
  * NOTE: test setup influenced by the steward sample test case from instructor
  *
- * test suite for the 
+ * test suite for the council room
  * card behavior: 
  * test setup: call initializeGame with 2 players, random seed of 10.
  * tests
@@ -21,7 +19,7 @@
  *   player 2 deck unchanged
  *   coins are unchanged
  *   player 1 discards 7 cards
- *   supply pile counjs are unchanged
+ *   supply pile counts are unchanged
  */
 
 void printResult(int expected, int actual, char *tmp);
@@ -77,7 +75,6 @@ int main (int argc, char** argv) {
     actual = post.discardCount[playerOne];
     printResult(expected, actual, "Player 1 discard count");
 
-    printf("Supply counts: ");
     for (i = 0; i < treasure_map + 1; i++) {
 	if (pre.supplyCount[i] != post.supplyCount[i]) {
 	    mismatch = 1;
@@ -85,7 +82,7 @@ int main (int argc, char** argv) {
 	}
     }
     if (!mismatch) {
-	printf("PASSED\n");
+	printf("PASSED: Supply counts unchanged\n");
     } else {
 	printf("FAILED: Supply counts don't match at card %d\n", i);
     }
