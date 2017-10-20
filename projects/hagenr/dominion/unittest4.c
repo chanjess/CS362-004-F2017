@@ -19,6 +19,8 @@
  * test setup: call playGame in 'silent' mode with 2 players and random seed 2.
  * test 1: compare score from dominion.c to score using a struct of card counts
  *   in each pile
+ * test 2: changed all cards in hand, discard, and deck to province, estate,
+ *   great hall respectively in order to better 'stress' test the function
  */
 
 /* struct to hold victory card counts in a player's deck */

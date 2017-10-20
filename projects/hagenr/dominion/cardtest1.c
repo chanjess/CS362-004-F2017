@@ -51,6 +51,7 @@ int main (int argc, char** argv) {
     printf("test suite for playing smithy\n");
     cardEffect(smithy, choice1, choice2, choice3, &post, handPos, &bonus);
 
+    printf("test 1 results\n");
     expected = pre.handCount[playerOne] + numNewCardsInHand - numPlayedCards;
     actual = post.handCount[playerOne];
     printResult(expected, actual, "Player 1 hand count");
