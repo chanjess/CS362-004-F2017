@@ -30,7 +30,20 @@ unittest3: unittest3.c dominion.o rngs.o
 unittest4: unittest4.c dominion.o rngs.o
 	gcc -o unittest4 -g unittest4.c dominion.o rngs.o $(CFLAGS)
 
-unittestresults.out: unittest1 unittest2 unittest3 unittest4 dominion.o rngs.o
+cardtest1: cardtest1.c dominion.o rngs.o
+	gcc -o cardtest1 -g cardtest1.c dominion.o rngs.o $(CFLAGS)
+
+cardtest2: cardtest2.c dominion.o rngs.o
+	gcc -o cardtest2 -g cardtest2.c dominion.o rngs.o $(CFLAGS)
+
+cardtest3: cardtest3.c dominion.o rngs.o
+	gcc -o cardtest3 -g cardtest3.c dominion.o rngs.o $(CFLAGS)
+
+cardtest4: cardtest4.c dominion.o rngs.o
+	gcc -o cardtest4 -g cardtest4.c dominion.o rngs.o $(CFLAGS)
+
+unittestresults.out: unittest1 unittest2 unittest3 unittest4 cardtest1 \
+	cardtest2 cardtest3 cardtest4 dominion.o rngs.o
 	@echo "unit tests starting"
 
 	@echo "Dominion Unit Test Results" > unittestresults.out
@@ -52,6 +65,22 @@ unittestresults.out: unittest1 unittest2 unittest3 unittest4 dominion.o rngs.o
 	@./unittest4 >> unittestresults.out
 	@gcov dominion.c >> unittestresults.out
 
+	@echo "cardtest1.c" >> unittestresults.out
+	@./cardtest1 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
+	@echo "cardtest2.c" >> unittestresults.out
+	@./cardtest2 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
+	@echo "cardtest3.c" >> unittestresults.out
+	@./cardtest3 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
+	@echo "cardtest4.c" >> unittestresults.out
+	@./cardtest4 >> unittestresults.out
+	@gcov dominion.c >> unittestresults.out
+
 	@echo "unit tests complete"
 
 testAll: dominion.o testSuite.c
@@ -68,7 +97,8 @@ runtests: testDrawCard
 player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
-all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 unittest3 unittest4 tags
+all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 \
+	unittest3 unittest4 cardtest1 cardtest2 cardtest3 cardtest4 tags
 
 .PHONY: tags clean
 
@@ -76,4 +106,7 @@ tags:
 	ctags --c-kinds=+egms `find . -name "*.[ch]" -print`
 
 clean:
-	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard badTestDrawCard unittest1 unittest2 unittest3 unittest4 tags
+	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard \
+		badTestDrawCard unittest1 unittest2 unittest3 unittest4 \
+		cardtest1 cardtest2 cardtest3 cardtest4 tags
+

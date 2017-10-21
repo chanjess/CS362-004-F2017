@@ -1,7 +1,7 @@
 #include "dominion.h"
 #include "dominion_helpers.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <math.h>
 #include "rngs.h"
 
 /*
@@ -19,6 +19,8 @@
  * test setup: call playGame in 'silent' mode with 2 players and random seed 2.
  * test 1: compare score from dominion.c to score using a struct of card counts
  *   in each pile
+ * test 2: changed all cards in hand, discard, and deck to province, estate,
+ *   great hall respectively in order to better 'stress' test the function
  */
 
 /* struct to hold victory card counts in a player's deck */
@@ -41,6 +43,7 @@ int main (int argc, char** argv) {
     int randomSeed = 2;
     int expectedPlayer1, expectedPlayer2;
     int actualPlayer1, actualPlayer2; 
+    int i;
 
     results = playGame(randomSeed);
 
@@ -58,6 +61,24 @@ int main (int argc, char** argv) {
     /* confirm that scoreFor uses the wrong limit on the 'score from deck' for loop */
     /* printf("p0 discards: %d, deck: %d, hand: %d\n", results.discardCount[0], results.deckCount[0], results.deckCount[0]); */
     /* printf("p1 discards: %d, deck: %d, hand: %d\n", results.discardCount[1], results.deckCount[1], results.deckCount[1]); */
+
+    /* change cards for player 1 to 'stress' the system */
+    for (i = 0; i < results.handCount[0]; i++)
+	results.hand[0][i] = province;
+    for (i = 0; i < results.discardCount[0]; i++)
+	results.discard[0][i] = estate;
+    for (i = 0; i < results.deckCount[0]; i++)
+	if (i % 2 == 0) results.deck[0][i] = duchy;
+    	else results.deck[0][i] = great_hall;
+
+    printf("test 2: ");
+    expectedPlayer1 = getScores(0, &results);
+    expectedPlayer2 = getScores(1, &results);
+    actualPlayer1 = scoreFor(0, &results);
+    actualPlayer2 = scoreFor(1, &results);
+    printf("%s", (expectedPlayer1 == actualPlayer1 && expectedPlayer2 == actualPlayer2) ? "PASS" : "FAIL");
+    printf(" - expected player 1: %d, got %d; expected player 2: %d, got %d\n",
+	    expectedPlayer1, actualPlayer1, expectedPlayer2, actualPlayer2);
 
     return 0;
 }
@@ -177,8 +198,6 @@ struct gameState playGame(int randomSeed) {
 
 int getScores(int player, struct gameState *state) {
     int score = 0;
-    int numCards = fullDeckCount(player, 0, state);
-    int gardenBonus = numCards / 10;
     // struct with all card counts of zero
     struct cardCounts myDeck = {0, 0, 0, 0, 0, 0};
 
@@ -186,8 +205,17 @@ int getScores(int player, struct gameState *state) {
     getCardCounts(player, state->handCount[player], state->hand[player], &myDeck);
     getCardCounts(player, state->discardCount[player], state->discard[player], &myDeck);
     getCardCounts(player, state->deckCount[player], state->deck[player], &myDeck);
-    /* comment out previous line, uncomment out next line to verify functions get same _wrong_ score */
+    /* comment out previous line and */
+    /* comment out next line to verify test functions get _wrong_ score */
     /* getCardCounts(player, state->discardCount[player], state->deck[player], &myDeck); */
+
+    // calc garden points
+    int numCards = myDeck.curses + myDeck.estates + myDeck.great_halls + 
+	myDeck.duchies + myDeck.provinces + myDeck.gardens;
+    int gardenBonus = (int)floor((float)numCards / 10);
+    /* there may be another issue to test, to see the error uncomment out the next 2 lines */
+    /* printf("numCards: %d, gardenBonus: %d\n", numCards, gardenBonus); */
+    /* printf("deckCount: %d\n", fullDeckCount(player, 0, state)); */
 
     score -= (myDeck.curses); 			// curse is -1 
     score += (myDeck.estates); 			// estates is +1
