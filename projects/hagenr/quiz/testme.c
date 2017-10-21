@@ -5,7 +5,7 @@
 
 #define MAXLEN 5
 
-char str[MAXLEN];
+char str[MAXLEN+1];
 
 /*
  * char inputChar()
@@ -22,16 +22,22 @@ char inputChar()
     return (char)tmp;
 }
 
-
+/*
+ * char *inputString()
+ * produces a random int in the range [97, 123) and returns a 
+ * string of composed of the associated lower case ascii characters
+ * based on a random number generator from CS 475
+ */
 char *inputString()
 {
     // TODO: rewrite this function
-    memset(str, '\0', MAXLEN);
+    memset(str, '\0', MAXLEN+1);
     /* int len = (rand() % MAXLEN) + 1; */
-    int len = 5;
+    int len = MAXLEN;
     int i;
 
     float r;
+    /* 97 is ascii 'a', 122 is 'z' */
     float low = 97, high = 123;
     int tmp;
     for (i = 0; i < len; i++) {
