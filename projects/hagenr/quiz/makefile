@@ -1,4 +1,3 @@
-# CFLAGS = -Wall -fpic -coverage -lm
 CFLAGS = -Wall -lm
 
 testme: testme.c
