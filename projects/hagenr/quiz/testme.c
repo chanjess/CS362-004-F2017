@@ -3,10 +3,13 @@
 #include<stdlib.h>
 #include<time.h>
 
+/* global constants */
 #define CHARS "[({ ax})]"
+#define CHARSLEN strlen(CHARS)
 #define TERMSTRING "reset"
 #define TERMSTRINGLEN strlen(TERMSTRING)
 
+/* global string */
 char str[TERMSTRINGLEN+1];
 
 /*
@@ -16,26 +19,24 @@ char str[TERMSTRINGLEN+1];
 char inputChar()
 {
     // TODO: rewrite this function
-    int len = strlen(CHARS);
-    return CHARS[rand() % len];
+    return CHARS[rand() % CHARSLEN];
 }
 
 /*
  * char *inputString()
- * returns a string composed of randomly chosen characters 
+ * returns a string composed of concatenating randomly chosen characters 
  * from a predefined string
  */
 char *inputString()
 {
     // TODO: rewrite this function
-    memset(str, '\0', TERMSTRINGLEN+1);
     int i;
-    char tmp;
 
-    for (i = 0; i < TERMSTRINGLEN; i++) {
-	tmp = TERMSTRING[rand() % TERMSTRINGLEN];
-	str[i] = tmp;
-    }
+    for (i = 0; i < TERMSTRINGLEN; i++)
+	str[i] = TERMSTRING[rand() % TERMSTRINGLEN];
+
+    /* add trailing null */
+    str[i] = '\0';
 
     return str;
 }
