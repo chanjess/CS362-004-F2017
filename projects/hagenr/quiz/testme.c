@@ -3,42 +3,40 @@
 #include<stdlib.h>
 #include<time.h>
 
-#define MAXLEN 5
+/* global constants */
+#define CHARS "[({ ax})]"
+#define CHARSLEN strlen(CHARS)
+#define TERMSTRING "reset"
+#define TERMSTRINGLEN strlen(TERMSTRING)
 
-char str[MAXLEN];
+/* global string */
+char str[TERMSTRINGLEN+1];
 
 /*
  * char inputChar()
- * produces a random int in the range [33, 126) and returns the
- * associated ascii char
- * based on a random number generator from CS 475
+ * returns: a random character from a pre-defined string
  */
 char inputChar()
 {
     // TODO: rewrite this function
-    /* 32 is ascii ' ', 125 is '}' */
-    float r = rand(), low = 32, high = 126;
-    int tmp = (int)(low + r * (high - low) / (float)RAND_MAX);
-    return (char)tmp;
+    return CHARS[rand() % CHARSLEN];
 }
 
-
+/*
+ * char *inputString()
+ * returns a string composed of concatenating randomly chosen characters 
+ * from a predefined string
+ */
 char *inputString()
 {
     // TODO: rewrite this function
-    memset(str, '\0', MAXLEN);
-    /* int len = (rand() % MAXLEN) + 1; */
-    int len = 5;
     int i;
 
-    float r;
-    float low = 97, high = 123;
-    int tmp;
-    for (i = 0; i < len; i++) {
-	r = rand();
-	tmp = (int)(low + r * (high - low) / (float)RAND_MAX);
-	str[i] = (char)tmp;
-    }
+    for (i = 0; i < TERMSTRINGLEN; i++)
+	str[i] = TERMSTRING[rand() % TERMSTRINGLEN];
+
+    /* add trailing null */
+    str[i] = '\0';
 
     return str;
 }
@@ -59,7 +57,7 @@ void testme()
 	if (c == '[' && state == 0) state = 1;
 	if (c == '(' && state == 1) state = 2;
 	if (c == '{' && state == 2) state = 3;
-	if (c == ' '&& state == 3) state = 4;
+	if (c == ' ' && state == 3) state = 4;
 	if (c == 'a' && state == 4) state = 5;
 	if (c == 'x' && state == 5) state = 6;
 	if (c == '}' && state == 6) state = 7;
