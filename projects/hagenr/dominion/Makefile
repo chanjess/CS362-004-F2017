@@ -1,46 +1,61 @@
-CFLAGS = -Wall -fpic -coverage -lm
+CFLAGS = -Wall -fpic -coverage -lm -g
 
 rngs.o: rngs.h rngs.c
-	gcc -c rngs.c -g  $(CFLAGS)
+	gcc -c rngs.c $(CFLAGS)
 
 dominion.o: dominion.h dominion.c rngs.o
-	gcc -c dominion.c -g  $(CFLAGS)
+	gcc -c dominion.c $(CFLAGS)
 
 playdom: dominion.o playdom.c
-	gcc -o playdom playdom.c -g dominion.o rngs.o $(CFLAGS)
+	gcc -o playdom playdom.c dominion.o rngs.o $(CFLAGS)
 #To run playdom you need to entere: ./playdom <any integer number> like ./playdom 10*/
 testDrawCard: testDrawCard.c dominion.o rngs.o
-	gcc  -o testDrawCard -g  testDrawCard.c dominion.o rngs.o $(CFLAGS)
+	gcc  -o testDrawCard testDrawCard.c dominion.o rngs.o $(CFLAGS)
 
 badTestDrawCard: badTestDrawCard.c dominion.o rngs.o
-	gcc -o badTestDrawCard -g  badTestDrawCard.c dominion.o rngs.o $(CFLAGS)
+	gcc -o badTestDrawCard badTestDrawCard.c dominion.o rngs.o $(CFLAGS)
 
 testBuyCard: testDrawCard.c dominion.o rngs.o
-	gcc -o testDrawCard -g  testDrawCard.c dominion.o rngs.o $(CFLAGS)
+	gcc -o testDrawCard testDrawCard.c dominion.o rngs.o $(CFLAGS)
 
 unittest1: unittest1.c dominion.o rngs.o
-	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)
+	gcc -o unittest1 unittest1.c dominion.o rngs.o $(CFLAGS)
 
 unittest2: unittest2.c dominion.o rngs.o
-	gcc -o unittest2 -g unittest2.c dominion.o rngs.o $(CFLAGS)
+	gcc -o unittest2 unittest2.c dominion.o rngs.o $(CFLAGS)
 
 unittest3: unittest3.c dominion.o rngs.o
-	gcc -o unittest3 -g unittest3.c dominion.o rngs.o $(CFLAGS)
+	gcc -o unittest3 unittest3.c dominion.o rngs.o $(CFLAGS)
 
 unittest4: unittest4.c dominion.o rngs.o
-	gcc -o unittest4 -g unittest4.c dominion.o rngs.o $(CFLAGS)
+	gcc -o unittest4 unittest4.c dominion.o rngs.o $(CFLAGS)
 
 cardtest1: cardtest1.c dominion.o rngs.o
-	gcc -o cardtest1 -g cardtest1.c dominion.o rngs.o $(CFLAGS)
+	gcc -o cardtest1 cardtest1.c dominion.o rngs.o $(CFLAGS)
 
 cardtest2: cardtest2.c dominion.o rngs.o
-	gcc -o cardtest2 -g cardtest2.c dominion.o rngs.o $(CFLAGS)
+	gcc -o cardtest2 cardtest2.c dominion.o rngs.o $(CFLAGS)
 
 cardtest3: cardtest3.c dominion.o rngs.o
-	gcc -o cardtest3 -g cardtest3.c dominion.o rngs.o $(CFLAGS)
+	gcc -o cardtest3 cardtest3.c dominion.o rngs.o $(CFLAGS)
 
 cardtest4: cardtest4.c dominion.o rngs.o
-	gcc -o cardtest4 -g cardtest4.c dominion.o rngs.o $(CFLAGS)
+	gcc -o cardtest4 cardtest4.c dominion.o rngs.o $(CFLAGS)
+
+randomtestadventurer: randomtestadventurer.c dominion.o rngs.o
+	gcc -o randomtestadventurer randomtestadventurer.c dominion.o rngs.o $(CFLAGS)
+
+randomtestresults.out: randomtestadventurer dominion.o rngs.o
+	@echo "random tests starting"
+	
+	@echo "Dominion Random Test Results" > randomtestresults.out
+	@echo "--------------------------" >> randomtestresults.out
+
+	@echo "randomtestadventurer.c" >> randomtestresults.out
+	@./randomtestadventurer >> randomtestresults.out
+	@gcov dominion.c >> randomtestresults.out
+
+	@echo "random tests complete"
 
 unittestresults.out: unittest1 unittest2 unittest3 unittest4 cardtest1 \
 	cardtest2 cardtest3 cardtest4 dominion.o rngs.o
@@ -98,7 +113,8 @@ player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
 all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 \
-	unittest3 unittest4 cardtest1 cardtest2 cardtest3 cardtest4 tags
+	unittest3 unittest4 cardtest1 cardtest2 cardtest3 cardtest4 tags \
+	randomtestadventurer
 
 .PHONY: tags clean
 
@@ -108,5 +124,5 @@ tags:
 clean:
 	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard \
 		badTestDrawCard unittest1 unittest2 unittest3 unittest4 \
-		cardtest1 cardtest2 cardtest3 cardtest4 tags
+		cardtest1 cardtest2 cardtest3 cardtest4 tags randomtestadventurer
 
