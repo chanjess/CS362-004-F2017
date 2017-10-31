@@ -42,6 +42,9 @@ cardtest3: cardtest3.c dominion.o rngs.o
 cardtest4: cardtest4.c dominion.o rngs.o
 	gcc -o cardtest4 cardtest4.c dominion.o rngs.o $(CFLAGS)
 
+randtest: randtest.c dominion.o rngs.o
+	gcc -o randtest randtest.c dominion.o rngs.o $(CFLAGS)
+
 randomtestadventurer: randomtestadventurer.c dominion.o rngs.o
 	gcc -o randomtestadventurer randomtestadventurer.c dominion.o rngs.o $(CFLAGS)
 
@@ -114,7 +117,7 @@ player: player.c interface.o
 
 all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 \
 	unittest3 unittest4 cardtest1 cardtest2 cardtest3 cardtest4 tags \
-	randomtestadventurer
+	randomtestadventurer randtest
 
 .PHONY: tags clean
 
@@ -124,5 +127,6 @@ tags:
 clean:
 	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard \
 		badTestDrawCard unittest1 unittest2 unittest3 unittest4 \
-		cardtest1 cardtest2 cardtest3 cardtest4 tags randomtestadventurer
+		cardtest1 cardtest2 cardtest3 cardtest4 tags randomtestadventurer \
+		randtest
 
