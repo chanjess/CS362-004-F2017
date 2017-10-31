@@ -28,7 +28,7 @@
  */
 
 /* global constants */
-#define NUMTESTS 10
+#define NUMTESTS 1000
 #define MINCARDS 3
 
 /* 
@@ -50,6 +50,7 @@ void randomizeGameState(struct gameState *state);
 int main() {
     srand(time(NULL));
 
+    printf("adventurer card: running %d tests....\n", NUMTESTS);
     struct errors e = {0};
     int i;
     for (i = 0; i < NUMTESTS; i++) {
@@ -58,39 +59,58 @@ int main() {
 	testCardAdventurer(&state, &e);
     }
 
-    printf("hand count errors: %d, total: %d, treasure: %d, opponent: %d\n", e.handCount, e.totalDeckDiscardCount, e.treasureCount, e.opponentCardCounts);
+    printf("done!\nerror rates\n");
+    printf("player hand count: %.2f%%\n", e.handCount * 1.0 / NUMTESTS * 100);
+    printf("total discards+deck count: %.2f%%\n", e.totalDeckDiscardCount * 1.0 / NUMTESTS * 100);
+    printf("treasure card counts: %.2f%%\n", e.treasureCount * 1.0 / NUMTESTS * 100);
+    printf("opponent card counts: %.2f%%\n", e.opponentCardCounts * 1.0 / NUMTESTS * 100);
     return 0;
 }
 
+/*
+ * void randomizeGameState(struct gameState *state)
+ * pass in a pointer to a blank gameState struct
+ * description: assign reasonable random values to struct data members
+ */
 void randomizeGameState(struct gameState *state) {
     int numPlayers = randi(2, MAX_PLAYERS); // range 0 - MAX_PLAYERS
     int playerNumber = randi(0, numPlayers);  // range 0 - numPlayers
 
     int i;
+    // assign random garbage, from the class lecture
     for (i = 0; i < sizeof(struct gameState); i++) {
 	((char*)state)[i] = floor(Random() * 256);
     }
 
+    // assign reasonable values to the salient data members
     state->deckCount[playerNumber] = randi(MINCARDS, MAX_DECK);
     state->discardCount[playerNumber] = randi(0, MAX_DECK - state->deckCount[playerNumber]);
     state->handCount[playerNumber] = randi(0, MAX_DECK - state->deckCount[playerNumber] - state->discardCount[playerNumber]);
     state->numPlayers = numPlayers;
     state->whoseTurn = playerNumber;
 
+    // assign random cards to deck, discard pile, and hand
     for (i = 0; i < state->deckCount[playerNumber]; i++)
 	state->deck[playerNumber][i] = randi(curse, treasure_map);
-
     for (i = 0; i < state->discardCount[playerNumber]; i++)
 	state->discard[playerNumber][i] = randi(curse, treasure_map);
-
     for (i = 0; i < state->handCount[playerNumber]; i++)
 	state->hand[playerNumber][i] = randi(curse, treasure_map);
 }
 
+/*
+ * void testCardAdventurer(struct gameState *pre, struct errors *e)
+ * pass in a pointer to a gameState struct with random values and a point to
+ * an error struct
+ * description: 
+ */
 void testCardAdventurer(struct gameState *pre, struct errors *e) {
+    // cardEffect variables
     int handPosn;  // range 0 - state->handCount[playerNumber]
     int choice1, choice2, choice3;  // range 0 - 26 (CARD values)
     int bonus;  // 0 - MAX_DECK
+
+    // test variables
     int playerNumber = pre->whoseTurn;
     struct gameState post;
     int i;
@@ -113,6 +133,7 @@ void testCardAdventurer(struct gameState *pre, struct errors *e) {
     /* printf("post game state\n"); */
     /* showGameState(&post); */
 
+    /* compare pre- to post-gameState, increment errors struct */
     /* adventure rules */
     /* post hand should have 2 more treasure cards */
     for (i = 0; i < pre->handCount[playerNumber]; i++) {
@@ -140,13 +161,29 @@ void testCardAdventurer(struct gameState *pre, struct errors *e) {
     for (i = 0; i < pre->numPlayers; i++) {
 	if (i == playerNumber) continue;
 	else {
-	    if (pre->deckCount[i] != post.deckCount[i]) e->opponentCardCounts++;
-	    if (pre->handCount[i] != post.handCount[i]) e->opponentCardCounts++;
-	    if (pre->discardCount[i] != post.discardCount[i]) e->opponentCardCounts++;
+	    if (pre->deckCount[i] != post.deckCount[i] || 
+		    pre->handCount[i] != post.handCount[i] ||
+		    pre->discardCount[i] != post.discardCount[i]) { e->opponentCardCounts++; }
 	}
     }
 }
 
+/* 
+ * int randi(int low, int high)
+ * description: returns a random integer in range [low, high)
+ * based on algorithm discussed in CS 475
+ */
+int randi(int low, int high) {
+    double r = rand();
+    return (int)(low + r * (high - low) / (double)RAND_MAX);
+}
+
+/*
+ * void showGameState(struct gameState *state) 
+ * pass in a pointer to a gameState struct
+ * description: prints out the data members of the gameState struct, very
+ *   helpful for debugging
+ */ 
 void showGameState(struct gameState *state) {
     int i;
     printf("num players: %d\n", state->numPlayers);
@@ -190,12 +227,3 @@ void showGameState(struct gameState *state) {
     /* printf("\n"); */
 }
 
-/* 
- * int randi(int low, int high)
- * returns a random integer in range [low, high)
- * based on algorithm discussed in CS 475
- */
-int randi(int low, int high) {
-    double r = rand();
-    return (int)(low + r * (high - low) / (double)RAND_MAX);
-}
