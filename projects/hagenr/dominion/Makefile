@@ -6,6 +6,9 @@ rngs.o: rngs.h rngs.c
 dominion.o: dominion.h dominion.c rngs.o
 	gcc -c dominion.c $(CFLAGS)
 
+randomhelpers.o: randomhelpers.c randomhelpers.h
+	gcc -c randomhelpers.c $(CFLAGS)
+
 playdom: dominion.o playdom.c
 	gcc -o playdom playdom.c dominion.o rngs.o $(CFLAGS)
 #To run playdom you need to entere: ./playdom <any integer number> like ./playdom 10*/
@@ -45,8 +48,14 @@ cardtest4: cardtest4.c dominion.o rngs.o
 randtest: randtest.c dominion.o rngs.o
 	gcc -o randtest randtest.c dominion.o rngs.o $(CFLAGS)
 
-randomtestadventurer: randomtestadventurer.c dominion.o rngs.o
-	gcc -o randomtestadventurer randomtestadventurer.c dominion.o rngs.o $(CFLAGS)
+randomtestcard1: randomtestcard1.c dominion.o rngs.o
+	gcc -o randomtestcard1 randomtestcard1.c dominion.o rngs.o $(CFLAGS)
+
+randomtestcard2: randomtestcard2.c dominion.o rngs.o
+	gcc -o randomtestcard2 randomtestcard2.c dominion.o rngs.o $(CFLAGS)
+
+randomtestadventurer: randomtestadventurer.c randomhelpers.o dominion.o rngs.o
+	gcc -o randomtestadventurer randomtestadventurer.c randomhelpers.o dominion.o rngs.o $(CFLAGS)
 
 randomtestresults.out: randomtestadventurer dominion.o rngs.o
 	@echo "random tests starting"
@@ -56,6 +65,14 @@ randomtestresults.out: randomtestadventurer dominion.o rngs.o
 
 	@echo "randomtestadventurer.c" >> randomtestresults.out
 	@./randomtestadventurer >> randomtestresults.out
+	@gcov dominion.c >> randomtestresults.out
+
+	@echo "randomtestcard1.c" >> randomtestresults.out
+	@./randomtestcard1 >> randomtestresults.out
+	@gcov dominion.c >> randomtestresults.out
+
+	@echo "randomtestcard2.c" >> randomtestresults.out
+	@./randomtestcard2 >> randomtestresults.out
 	@gcov dominion.c >> randomtestresults.out
 
 	@echo "random tests complete"
@@ -117,7 +134,7 @@ player: player.c interface.o
 
 all: playdom player testDrawCard testBuyCard badTestDrawCard unittest1 unittest2 \
 	unittest3 unittest4 cardtest1 cardtest2 cardtest3 cardtest4 tags \
-	randomtestadventurer randtest
+	randomtestadventurer randomtestcard1 randomtestcard2 randtest
 
 .PHONY: tags clean
 
@@ -128,5 +145,5 @@ clean:
 	rm -f *.o playdom player *.gcov *.gcda *.gcno *.so *.out testDrawCard \
 		badTestDrawCard unittest1 unittest2 unittest3 unittest4 \
 		cardtest1 cardtest2 cardtest3 cardtest4 tags randomtestadventurer \
-		randtest
+		randomtestcard1 randomtestcard2 randtest
 

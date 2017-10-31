@@ -12,19 +12,20 @@
  *   http://wiki.dominionstrategy.com/index.php/Adventurer
  * NOTE: test setup influenced by the testDrawCard sample from instructor
  *
- * random test suite for the adventurer card
- * card behavior: play the adventurer card. keep revealing cards from your deck
- *   until you find 2 treasure cards, which you add to your hand. discard the
- *   other revealed cards
+ * random test suite for the smithy card
+ * card behavior: play the smithy card and add three cards from their 
+ *   deck to their hand. no changes to state of other player and no changes in
+ *   the number of cards in the supply piles. 
  * test setup: create a gameState struct with random values, 'pre'. call
  *   cardEffect with a copy of 'pre' called 'post'. compare the structs and
  *   report differences
- * tests, one for each player
- *   player deck has x fewer cards - no visibility into this metric
- *   player hand has 2 more treasure cards
- *   player hand has 2 more cards
- *   player deck + discard has 2 fewer cards
- *   opponent card counts unchanged
+ * 2 tests, one for each player (player 1 is 'player', player 2 is 'opponent'):
+ *   player deck has 3 fewer cards
+ *   player hand has 1 more cards
+ *   player played 1 card
+ *   opponent deck unchanged
+ *   player discards 7 cards
+ *   supply pile counts are unchanged
  */
 
 /* global constants */
