@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 #include "dominion.h"
 #include "dominion_helpers.h"
 #include "rngs.h"
@@ -15,37 +16,135 @@
  * card behavior: play the adventurer card. keep revealing cards from your deck
  *   until you find 2 treasure cards, which you add to your hand. discard the
  *   other revealed cards
- * test setup: create 2 gameState structs with random values. call cardEffect 
- *   with 1 gameState and random args. manually manipulate the other gameState
- *   via adventurer rules and same random arg values. compare the structs and
+ * test setup: create a gameState struct with random values, 'pre'. call
+ *   cardEffect with a copy of 'pre' called 'post'. compare the structs and
  *   report differences
- * 2 tests, one for each player (player 1 is 'player', player 2 is 'opponent'):
+ * tests, one for each player
  *   player deck has x fewer cards - no visibility into this metric
- *   player hand has 1 more cards
- *   player played 1 card
- *   opponent deck unchanged
- *   coins are unchanged
- *   player discards 7 cards
- *   supply pile counts are unchanged
+ *   player hand has 2 more treasure cards
+ *   player hand has 2 more cards
+ *   player deck + discard has 2 fewer cards
+ *   opponent card counts unchanged
  */
 
 /* global constants */
 #define NUMTESTS 10
 #define MINCARDS 3
 
+/* 
+ * struct to hold number of mismatches between pre- & post-gameState
+ */
+struct errors {
+    int handCount;
+    int totalDeckDiscardCount;
+    int treasureCount;
+    int opponentCardCounts;
+};
+
 /* function prototypes */
-void testCardAdventurer(struct gameState *state);
+void testCardAdventurer(struct gameState *pre, struct errors *e);
 int randi(int low, int high);
 void showGameState(struct gameState *state);
+void randomizeGameState(struct gameState *state);
 
-/* 
- * int randi(int low, int high)
- * returns a random integer in range [low, high)
- * based on algorithm discussed in CS 475
- */
-int randi(int low, int high) {
-    double r = rand();
-    return (int)(low + r * (high - low) / (double)RAND_MAX);
+int main() {
+    srand(time(NULL));
+
+    struct errors e = {0};
+    int i;
+    for (i = 0; i < NUMTESTS; i++) {
+	struct gameState state;
+	randomizeGameState(&state);
+	testCardAdventurer(&state, &e);
+    }
+
+    printf("hand count errors: %d, total: %d, treasure: %d, opponent: %d\n", e.handCount, e.totalDeckDiscardCount, e.treasureCount, e.opponentCardCounts);
+    return 0;
+}
+
+void randomizeGameState(struct gameState *state) {
+    int numPlayers = randi(2, MAX_PLAYERS); // range 0 - MAX_PLAYERS
+    int playerNumber = randi(0, numPlayers);  // range 0 - numPlayers
+
+    int i;
+    for (i = 0; i < sizeof(struct gameState); i++) {
+	((char*)state)[i] = floor(Random() * 256);
+    }
+
+    state->deckCount[playerNumber] = randi(MINCARDS, MAX_DECK);
+    state->discardCount[playerNumber] = randi(0, MAX_DECK - state->deckCount[playerNumber]);
+    state->handCount[playerNumber] = randi(0, MAX_DECK - state->deckCount[playerNumber] - state->discardCount[playerNumber]);
+    state->numPlayers = numPlayers;
+    state->whoseTurn = playerNumber;
+
+    for (i = 0; i < state->deckCount[playerNumber]; i++)
+	state->deck[playerNumber][i] = randi(curse, treasure_map);
+
+    for (i = 0; i < state->discardCount[playerNumber]; i++)
+	state->discard[playerNumber][i] = randi(curse, treasure_map);
+
+    for (i = 0; i < state->handCount[playerNumber]; i++)
+	state->hand[playerNumber][i] = randi(curse, treasure_map);
+}
+
+void testCardAdventurer(struct gameState *pre, struct errors *e) {
+    int handPosn;  // range 0 - state->handCount[playerNumber]
+    int choice1, choice2, choice3;  // range 0 - 26 (CARD values)
+    int bonus;  // 0 - MAX_DECK
+    int playerNumber = pre->whoseTurn;
+    struct gameState post;
+    int i;
+    int preTreasureCardsInHand = 0;
+    int postTreasureCardsInHand = 0;
+
+    handPosn = randi(0, pre->handCount[playerNumber]);
+    pre->hand[playerNumber][handPosn] = adventurer;
+
+    memcpy(&post, pre, sizeof(struct gameState));
+
+    bonus = randi(0, MAX_DECK);
+    choice1 = randi(curse, treasure_map);
+    choice2 = randi(curse, treasure_map);
+    choice3 = randi(curse, treasure_map);
+
+    /* printf("pre game state\n"); */
+    /* showGameState(pre); */
+    cardEffect(adventurer, choice1, choice2, choice3, &post, handPosn, &bonus); 
+    /* printf("post game state\n"); */
+    /* showGameState(&post); */
+
+    /* adventure rules */
+    /* post hand should have 2 more treasure cards */
+    for (i = 0; i < pre->handCount[playerNumber]; i++) {
+	int cardPre = pre->hand[playerNumber][i];
+	if (cardPre == copper || cardPre == gold || cardPre == silver) {
+	    preTreasureCardsInHand++;
+	}
+    }
+    for (i = 0; i < post.handCount[playerNumber]; i++) {
+	int cardPost = post.hand[playerNumber][i];
+	if (cardPost == copper || cardPost == gold || cardPost == silver) {
+	    postTreasureCardsInHand++;
+	}
+    }
+    if (preTreasureCardsInHand + 2 != postTreasureCardsInHand) e->treasureCount++;
+
+    /* hand should have only 2 more cards */
+    if (pre->handCount[playerNumber] + 2 != post.handCount[playerNumber]) e->handCount++;
+
+    /* post deck + discard should be 2 less than pre */
+    if (pre->deckCount[playerNumber] + pre->discardCount[playerNumber] != 
+	    post.deckCount[playerNumber] + post.discardCount[playerNumber] + 2) { e->totalDeckDiscardCount++; }
+
+    /* opponent cards counts unchanged */
+    for (i = 0; i < pre->numPlayers; i++) {
+	if (i == playerNumber) continue;
+	else {
+	    if (pre->deckCount[i] != post.deckCount[i]) e->opponentCardCounts++;
+	    if (pre->handCount[i] != post.handCount[i]) e->opponentCardCounts++;
+	    if (pre->discardCount[i] != post.discardCount[i]) e->opponentCardCounts++;
+	}
+    }
 }
 
 void showGameState(struct gameState *state) {
@@ -85,76 +184,18 @@ void showGameState(struct gameState *state) {
 	printf("p%d: %d ", i, state->discardCount[i]);
     printf("\n");
 
-    printf("played cards: ");
-    for (i = 0; i < MAX_DECK; i++)
-	printf("%d ", state->playedCards[i]);
-    printf("\n");
-}
-/* k = { 7, 9, 22, 14, 17, 11, 21, 25, 19, 13 }
-   enum CARD 
-   {curse, estate, duchy, province,
-   copper, silver, gold,
-7: adventurer, council_room, feast, gardens, mine, remodel,
-13: smithy, village, baron, great_hall, minion, steward,
-19: tribute, ambassador, cutpurse, embargo, outpost, salvager,
-25: sea_hag, treasure_map };
-*/
-
-int main() {
-    srand(time(NULL));
-    int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse,
-	sea_hag, tribute, smithy};
-    int seed = 10;
-
-    int numPlayers; // range 0 - MAX_PLAYERS
-    int playerNumber; // range 0 - numPlayers
-
-    /* int treasureInDeck; */
-    /* int treasureCards[] = {copper, silver, gold}; */
-    /* int szTreasureCards = sizeof(treasureCards) / sizeof(treasureCards[0]); */
-    /* int tcIdx; */
-
-    int i;
-    for (i = 0; i < NUMTESTS; i++) {
-	struct gameState state;
-	numPlayers = randi(2, MAX_PLAYERS);
-	playerNumber = randi(0, numPlayers);
-
-	initializeGame(numPlayers, k, seed, &state);
-	state.handCount[playerNumber] = 5;
-	state.discardCount[playerNumber] = 0;
-	state.whoseTurn = playerNumber;
-
-	if (i + 1 == NUMTESTS)
-	    state.deckCount[playerNumber] = 2;
-	else
-	    state.deckCount[playerNumber] = randi(0, MAX_DECK);
-
-	/* treasureInDeck = randi(0, state.deckCount[playerNumber]); */
-	/* for (i = 0; i < treasureInDeck; i++) { */
-	/*     tcIdx = randi(0, szTreasureCards); */
-	/*     state.deck[playerNumber][i] = treasureCards[tcIdx]; */
-	/*     state.supplyCount[treasureCards[tcIdx]]--; */
-	/* } */
-
-	testCardAdventurer(&state);
-    }
-
-    return 0;
+    /* printf("played cards: "); */
+    /* for (i = 0; i < MAX_DECK; i++) */
+    /* printf("%d ", state->playedCards[i]); */
+    /* printf("\n"); */
 }
 
-void testCardAdventurer(struct gameState *state) {
-    int handPos;  // range 0 - 4
-    int choice1, choice2, choice3;  // range 0 - 26 (CARD values)
-    int bonus;  // 0 - MAX_RAND
-
-    handPos = 1;
-    bonus = 0;
-    choice1 = choice2 = choice3 = 0;
-    printf("pre game state\n");
-    showGameState(state);
-    cardEffect(adventurer, choice1, choice2, choice3, state, handPos, &bonus); 
-    endTurn(state);
-    printf("post game state\n");
-    showGameState(state);
+/* 
+ * int randi(int low, int high)
+ * returns a random integer in range [low, high)
+ * based on algorithm discussed in CS 475
+ */
+int randi(int low, int high) {
+    double r = rand();
+    return (int)(low + r * (high - low) / (double)RAND_MAX);
 }
