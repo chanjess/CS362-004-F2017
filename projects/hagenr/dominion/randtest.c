@@ -35,9 +35,9 @@ void randomizeGameState(struct gameState *state);
 */
 
 /* one way to force the shuffle function call
-if (i + 1 == NUMTESTS) state.deckCount[playerNumber] = 2;
-else state.deckCount[playerNumber] = randi(0, MAX_DECK);
-*/
+   if (i + 1 == NUMTESTS) state.deckCount[playerNumber] = 2;
+   else state.deckCount[playerNumber] = randi(0, MAX_DECK);
+   */
 
 int main() {
     srand(time(NULL));
@@ -56,7 +56,7 @@ int main() {
 
 void randomizeGameState(struct gameState *state) {
     /* int k[] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, */
-	/* sea_hag, tribute, smithy}; */
+    /* sea_hag, tribute, smithy}; */
 
     int numPlayers = randi(2, MAX_PLAYERS); // range 0 - MAX_PLAYERS
     int playerNumber = randi(0, numPlayers);  // range 0 - numPlayers
@@ -80,31 +80,30 @@ void randomizeGameState(struct gameState *state) {
 
     for (i = 0; i < state->handCount[playerNumber]; i++)
 	state->hand[playerNumber][i] = randi(curse, treasure_map);
-    /*
-       printf("\nrandom player 2 deck\n");
-       for (i = 0; i < state.deckCount[playerNumber]; i++)
-       printf("card %d: %d\n", i, state.deck[playerNumber][i]);
-       printf("\nrandom player 2 discards\n");
-       for (i = 0; i < state.discardCount[playerNumber]; i++)
-       printf("card %d: %d\n", i, state.discard[playerNumber][i]);
-       printf("\nrandom player 2 hand\n");
-       for (i = 0; i < state.handCount[playerNumber]; i++)
-       printf("card %d: %d\n", i, state.hand[playerNumber][i]);
-       */
+    printf("\nrandom player 2 deck\n");
+
+    for (i = 0; i < state->deckCount[playerNumber]; i++)
+	printf("card %d: %d\n", i, state->deck[playerNumber][i]);
+    printf("\nrandom player 2 discards\n");
+    for (i = 0; i < state->discardCount[playerNumber]; i++)
+	printf("card %d: %d\n", i, state->discard[playerNumber][i]);
+    printf("\nrandom player 2 hand\n");
+    for (i = 0; i < state->handCount[playerNumber]; i++)
+	printf("card %d: %d\n", i, state->hand[playerNumber][i]);
 }
 
 void testCardAdventurer(struct gameState *pre, struct errors *e) {
     int handPosn;  // range 0 - state->handCount[playerNumber]
     int choice1, choice2, choice3;  // range 0 - 26 (CARD values)
     int bonus;  // 0 - MAX_DECK
-    int playerNumber = pre->whoseTurn;
-    struct gameState post;
     int i;
     int preTreasureCardsInHand = 0;
     int postTreasureCardsInHand = 0;
+    int playerNumber = pre->whoseTurn;
+    struct gameState post;
 
     handPosn = randi(0, pre->handCount[playerNumber]);
-    pre->hand[playerNumber][handPosn] = adventurer;
+    pre->hand[playerNumber][handPosn] = smithy;
 
     memcpy(&post, pre, sizeof(struct gameState));
 
@@ -115,7 +114,7 @@ void testCardAdventurer(struct gameState *pre, struct errors *e) {
     printf("pre game state\n");
     showGameState(pre);
 
-    cardEffect(adventurer, choice1, choice2, choice3, &post, handPosn, &bonus); 
+    cardEffect(smithy, choice1, choice2, choice3, &post, handPosn, &bonus); 
     /* endTurn(state); */
     printf("post game state\n");
     showGameState(&post);

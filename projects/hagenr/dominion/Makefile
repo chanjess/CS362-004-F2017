@@ -48,16 +48,16 @@ cardtest4: cardtest4.c dominion.o rngs.o
 randtest: randtest.c dominion.o rngs.o
 	gcc -o randtest randtest.c dominion.o rngs.o $(CFLAGS)
 
-randomtestcard1: randomtestcard1.c dominion.o rngs.o
-	gcc -o randomtestcard1 randomtestcard1.c dominion.o rngs.o $(CFLAGS)
+randomtestcard1: randomtestcard1.c randomhelpers.o dominion.o rngs.o
+	gcc -o randomtestcard1 randomtestcard1.c randomhelpers.o dominion.o rngs.o $(CFLAGS)
 
-randomtestcard2: randomtestcard2.c dominion.o rngs.o
-	gcc -o randomtestcard2 randomtestcard2.c dominion.o rngs.o $(CFLAGS)
+randomtestcard2: randomtestcard2.c randomhelpers.o dominion.o rngs.o
+	gcc -o randomtestcard2 randomtestcard2.c randomhelpers.o dominion.o rngs.o $(CFLAGS)
 
 randomtestadventurer: randomtestadventurer.c randomhelpers.o dominion.o rngs.o
 	gcc -o randomtestadventurer randomtestadventurer.c randomhelpers.o dominion.o rngs.o $(CFLAGS)
 
-randomtestresults.out: randomtestadventurer dominion.o rngs.o
+randomtestresults.out: randomtestadventurer randomtestcard1 randomtestcard2 dominion.o rngs.o
 	@echo "random tests starting"
 	
 	@echo "Dominion Random Test Results" > randomtestresults.out
