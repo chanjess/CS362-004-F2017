@@ -1,0 +1,185 @@
+//
+//  randomtestcard1.c
+//  assignment-4
+//
+//  Created by Kevin Conner on 10/28/17.
+//  Copyright © 2017 Kevin Conner. All rights reserved.
+//
+// randomly test council card
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include "dominion_helpers.h"
+#include "randomtestcard.h"
+
+// return true if arrays are equal false otherise
+int kcardcheck(int k[], int orig[])
+{
+    int i;
+    for (i = 0; i < 10; i++)
+    {
+        if (k[i] != orig[i]) {
+            printf("Failed: Kingdom cards changed\n");
+            return 0;
+        }
+    }
+    printf("Passed: Kingdom cards are unchanged\n");
+    return 1;
+}
+
+// tests return value of program
+void retvaluecheck(int retvalue)
+{
+    if (retvalue == 0) {
+        printf("Passed: Program didn't crash.\n");
+    } else {
+        printf("Failed: Program crashed\n");
+    }
+}
+
+// tests for correct number of cards in hand for current player +4
+void handcheck(struct gameState *preg, struct gameState *postg)
+{
+    if (preg->handCount[0]+4 == postg->handCount[0]) {
+        printf("Passed: Correct number of cards in current player hand.\n");
+    } else {
+        printf("Failed: Incorrect number of cards in current player hand.\n");
+    }
+    
+}
+
+// 4 cards for current player 1 card drawn for each opponent from deck
+void deckcheck(struct gameState *preg, struct gameState *postg)
+{
+    int i;
+    
+    if (preg->deckCount[0]-4 == postg->deckCount[0]) {
+        printf("Passed: Correct number of cards in current player deck.\n");
+    } else {
+        printf("Failed: Incorrect number of cards in current player deck.\n");
+    }
+    
+    for (i = 1; i < preg->numPlayers; i++) {
+        if (preg->deckCount[i]-1 == postg->handCount[i]) {
+            printf("Passed: Player %d has the correct deck count\n", i);
+        } else {
+            printf("Failed: Player %d has the incorrect deck count\n", i);
+        }
+    }
+}
+
+// each opponent should have 1 more card
+void opponenthandcheck(struct gameState *preg, struct gameState *postg)
+{
+    int i;
+    
+    for (i = 1; i < preg->numPlayers; i++) {
+        if (preg->handCount[i]+1 == postg->handCount[i]) {
+            printf("Passed: Player %d has the correct hand count\n", i);
+        } else {
+            printf("Failed: Player %d has the incorrect hand count\n", i);
+        }
+    }
+}
+
+void checkState(struct gameState pregs, struct gameState postgs)
+{
+    if (pregs.numPlayers == postgs.numPlayers) {
+        printf("Passed: numPlayers unchanged.\n");
+    } else {
+        printf("Failed: numPlayers changed.\n");
+    }
+    
+    if (! memcmp(pregs.supplyCount, postgs.supplyCount, (treasure_map+1) * sizeof(int))) {
+        printf("Passed: supplyCount unchanged.\n");
+    } else {
+        printf("Failed: supplyCount changed.\n");
+    }
+    
+    if (! memcmp(pregs.embargoTokens, postgs.embargoTokens, (treasure_map+1) * sizeof(int))) {
+        printf("Passed: embargoTokens unchanged.\n");
+    } else {
+        printf("Failed: embargoTokens changed.\n");
+    }
+    
+    if (pregs.outpostPlayed == postgs.outpostPlayed) {
+        printf("Passed: outpostPlayed unchanged.\n");
+    } else {
+        printf("Failed: outpostPlayed changed.\n");
+    }
+    
+    if (pregs.outpostTurn == postgs.outpostTurn) {
+        printf("Passed: outpostTurn unchanged.\n");
+    } else {
+        printf("Failed: outpostTurn changed.\n");
+    }
+    
+    if (pregs.whoseTurn == postgs.whoseTurn) {
+        printf("Passed: whosePlayed unchanged.\n");
+    } else {
+        printf("Failed: whosePlayed changed.\n");
+    }
+    
+    if (pregs.phase == postgs.phase) {
+        printf("Passed: phase unchanged.\n");
+    } else {
+        printf("Failed: phase changed.\n");
+    }
+    
+    if (pregs.numActions == postgs.numActions) {
+        printf("Passed: numActions unchanged.\n");
+    } else {
+        printf("Failed: numActions changed.\n");
+    }
+    
+    if (pregs.coins == postgs.coins) {
+        printf("Passed: coins unchanged.\n");
+    } else {
+        printf("Failed: coins changed.\n");
+    }
+    
+    if (pregs.numBuys+1 == postgs.numBuys) {
+        printf("Passed: numBuys unchanged.\n");
+    } else {
+        printf("Failed: numBuys changed.\n");
+    }
+}
+
+int main()
+{
+    srand(time(NULL));
+    
+    struct gameState *postg;
+    struct gameState preg;
+    int seed;
+    int retvalue;
+    int i;
+    
+    int postk[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, sea_hag, tribute, remodel};
+    int prek[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, sea_hag, tribute, remodel};
+    
+    // execute 5 random tests
+    for (i = 0; i < 5; i++)
+    {
+        printf("\nInitializing council_room card test %d with random seed\n", i+1);
+        seed = rand() % 101;
+        postg = NULL;
+        postg = newGame();
+        initializeGame(2, postk, seed, postg);
+        preg = *postg;
+        
+        // run program
+        retvalue = council_room_card(postg, 0, 0);
+        
+        // begin tests
+        retvaluecheck(retvalue);
+        handcheck(&preg, postg);
+        deckcheck(&preg, postg);
+        opponenthandcheck(&preg, postg);
+        checkState(preg, *postg);
+        kcardcheck(postk, prek);
+    }
+    return 0;
+}
