@@ -1250,7 +1250,8 @@ void makeAdventurer(struct gameState *state, int currentPlayer, int *temphand) {
 void makeSmithy(struct gameState *state, int currentPlayer, int handPos) {
     //+3 Cards
     int i;
-    for (i = 0; i <= 3; i++)
+    /* for (i = 0; i <= 3; i++) */
+    for (i = 0; i < 3; i++)
     {
 	drawCard(currentPlayer, state);
     }
