@@ -11,8 +11,7 @@ Date:        13 Nov 2017
 Reported By: Ron Hagen 
 Email:       hagenr@oregonstate.edu 
 
-
-Product:  Dominion                 Version:
+Product:  Dominion                 Version: 1.0 (I assume)
 Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
 Browser:  N/A                      Version:
 URL:      N/A       
@@ -73,8 +72,7 @@ Date:        13 Nov 2017
 Reported By: Ron Hagen 
 Email:       hagenr@oregonstate.edu 
 
-
-Product:  Dominion                 Version:
+Product:  Dominion                 Version: 1.0 (I assume)
 Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
 Browser:  N/A                      Version:
 URL:      N/A       
@@ -125,8 +123,7 @@ Date:        13 Nov 2017
 Reported By: Ron Hagen 
 Email:       hagenr@oregonstate.edu 
 
-
-Product:  Dominion                 Version:
+Product:  Dominion                 Version: 1.0 (I assume)
 Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
 Browser:  N/A                      Version:
 URL:      N/A       
@@ -147,7 +144,8 @@ for the random test: type "./randomtestcard1
 
 Expected vs Actual Results
 ----------------
-Player played card count - expected 1, got 0
+unit test: Player played card count - expected 1, got 0
+random test: 100% error rate in player played card count
 
 Workarounds
 -----------

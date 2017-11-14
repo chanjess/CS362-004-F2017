@@ -441,7 +441,8 @@ int scoreFor (int player, struct gameState *state) {
     }
     
     //score from deck
-    for (i = 0; i < state->discardCount[player]; i++)
+    /* for (i = 0; i < state->discardCount[player]; i++) */
+    for (i = 0; i < state->deckCount[player]; i++)
     {
         if (state->deck[player][i] == curse) { score = score - 1; };
         if (state->deck[player][i] == estate) { score = score + 1; };
@@ -1280,7 +1281,8 @@ int smithy_card(struct gameState *state, int currentPlayer, int handPos)
     }
     
     //discard card from hand
-    discardCard(handPos, currentPlayer, state, 1);
+    /* discardCard(handPos, currentPlayer, state, 1); */
+    discardCard(handPos, currentPlayer, state, 0);
     return 0;
 }
 
@@ -1324,7 +1326,8 @@ int council_room_card(struct gameState *state, int currentPlayer, int handPos)
     //Each other player draws a card
     for (i = 0; i < state->numPlayers; i++)
     {
-        if ( i == currentPlayer )
+        /* if ( i == currentPlayer ) */
+        if ( i != currentPlayer )
         {
             drawCard(i, state);
         }
