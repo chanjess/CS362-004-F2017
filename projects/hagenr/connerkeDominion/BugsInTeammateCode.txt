@@ -1,0 +1,166 @@
+Dominion Bug Reports (based on Noverse Bug Reporting Template)
+Three bugs reported in this file, search for the word "Title"
+
+==============================
+
+Title:       Game score calculation incorrect
+
+Class:       Serious Bug
+
+Date:        13 Nov 2017
+Reported By: Ron Hagen 
+Email:       hagenr@oregonstate.edu 
+
+Product:  Dominion                 Version: 1.0 (I assume)
+Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
+Browser:  N/A                      Version:
+URL:      N/A       
+
+Is it reproducible: Yes
+
+Description
+===========
+The player score at the end of the game is not correct.
+This bug does not interrupt normal game play, but can be found by running 
+unittest4. There are two tests: the first compares the score calculated 
+according to the official rules to the score reported at the end of the normal
+game for two players and a random seed of 2; the second with a contrived set
+of cards designed to 'stress' the point-calculation algorithm.
+
+Steps to Produce/Reproduce
+--------------------------
+The bug will occur at the end of a game. To force the issue, install
+the game and type "make clean && make all" at the command prompt
+
+normal game play type "./playdom 2" at the command prompt
+for the unit test: type "./unittest4 at the command prompt
+
+Expected Results
+----------------
+	  test 1   test 2
+player 1: 27       73
+player 2: 27       27
+
+Actual Results
+----------------
+	  test 1   test 2
+player 1: 2        20
+player 2: 27       20
+
+Workarounds
+-----------
+No workarounds
+
+
+Attachments
+-----------
+Please review unittestresults.out and dominion.c.gcov for additional detail.
+
+Other Information
+-----------------
+The bug is in the scoreFor function. The third for-loop (dominion.c: line 444)
+uses a limit based on the discardCount instead of the deckCount. Therefore all 
+cards in the deck are not scored.
+
+==============================
+
+Title: Wrong player draws an extra card when council room card played
+
+Class: Serious Bug
+
+Date:        13 Nov 2017
+Reported By: Ron Hagen 
+Email:       hagenr@oregonstate.edu 
+
+Product:  Dominion                 Version: 1.0 (I assume)
+Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
+Browser:  N/A                      Version:
+URL:      N/A       
+
+Is it reproducible: Yes
+
+Description
+===========
+After playing the council room card the player hand and deck counts are one
+card too high, the opponent hand and deck counts are too low by one.
+
+Steps to Produce/Reproduce
+--------------------------
+The bug will occur any time the council room card is played during a game. To
+force the issue, install the game type "make clean && make all" at the prompt
+
+for the unit test: type "./cardtest3 at the command prompt
+
+Expected vs Actual Results
+----------------
+Player hand count - expected 8, got 9
+Player deck count - expected 1, got 0
+Opponent deck count - expected 9, got 10
+Opponent hand count - expected 1, got 0
+
+Workarounds
+-----------
+No workarounds
+
+Attachments
+-----------
+Please review unittestresults.out and dominion.c.gcov for
+additional detail.
+
+Other Information
+-----------------
+I traced the execution of the council_room_card function. I found the bug in the
+if-statement (dominion.c: line 1327); the condition should be 'not equals'.
+
+
+==============================
+
+Title: Player fails to discard after playing smithy card
+
+Class: Serious Bug
+
+Date:        13 Nov 2017
+Reported By: Ron Hagen 
+Email:       hagenr@oregonstate.edu 
+
+Product:  Dominion                 Version: 1.0 (I assume)
+Platform: Linux (flip3)            Version: 3.10-514.26.2.el7.x86_64 #1 SMP
+Browser:  N/A                      Version:
+URL:      N/A       
+
+Is it reproducible: Yes
+
+Description
+===========
+The player played-card count is off by one after playing the smithy card.
+
+Steps to Produce/Reproduce
+--------------------------
+The bug will occur any time the smithy card is played during a game. To force
+the issue, install the game type "make clean && make all" at the command prompt
+
+for the unit test: type "./cardtest1 at the command prompt
+for the random test: type "./randomtestcard1
+
+Expected vs Actual Results
+----------------
+unit test: Player played card count - expected 1, got 0
+random test: 100% error rate in player played card count
+
+Workarounds
+-----------
+No workarounds
+
+Attachments
+-----------
+Please review unittestresults.out, randomtestresults.out, and dominion.c.gcov
+for additional detail.
+
+Other Information
+-----------------
+I traced the execution of the smithy_card function. The bug became clear when
+I hit the call to discardCard (dominion.c: line 1285) and stepped into that
+function. The discardCard fourth argument is 1, which is the trash flag
+parameter. When this is 1, the card is removed from play rather than discarded.
+To be correct, the value should be 0.
+
