@@ -75,6 +75,9 @@ public class UrlValidatorTest extends TestCase {
     *
     * @param testObjects Used to create a url.
     */
-   
+
+   public static void main(String[] args) {
+       System.out.println("hi ron");
+   }
 
 }
