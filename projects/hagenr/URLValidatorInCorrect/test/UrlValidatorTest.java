@@ -33,7 +33,7 @@ public class UrlValidatorTest extends TestCase {
 	private static final String[] VALID_SCHEMES = {"http", "https", "ftp"};
 	private static final String[] VALID_TLDS = {"com", "gov", "edu", "org"};
 	private static final String URL_REGEX =    "^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?";
-	private static final int NUM_TESTS = 100;
+	private static final int NUM_TESTS = 1;
 
 	private UrlValidatorTest(String testName) {
 		super(testName);
@@ -100,8 +100,8 @@ public class UrlValidatorTest extends TestCase {
 	public void testIsValid()
 	{
 		Pattern urlPattern = Pattern.compile(URL_REGEX);
-		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
-		String testUrl, scheme, authority, port, query;
+		UrlValidator urlVal = new UrlValidator();
+		String testUrl, scheme, authority, query;
 		boolean expected;
 
 		for (int i = 0; i < NUM_TESTS; i++) {
@@ -127,8 +127,8 @@ public class UrlValidatorTest extends TestCase {
 
 					// test the optional port
 					if (auths.length == 2) {
-						port = auths[1];
-						expected &= isPortValid(Integer.parseInt(port));
+						// port = auths[1];
+						expected &= isPortValid(auths[1]);
 					}
 				}
 
@@ -154,18 +154,24 @@ public class UrlValidatorTest extends TestCase {
 		Random rand = new Random();
 		final String[] schemes = {"http", "https", "ftp", "", "htp"};
 		final String[] tlds = {"com", "gov", "org", "", "edu", "zog"};
+		final String[] names = {"yahoo.", "", "a.", "123.", "google."};
 		StringBuilder sb = new StringBuilder();
 
 		// pick a random scheme
 		sb.append(schemes[rand.nextInt(schemes.length)]);
 
-		// 1 in 20 chance to not add the '://'
-		if (rand.nextInt(20) != 10) {
+		// 1 in 10 chance to not add the '://'
+		if (rand.nextInt(10) != 0) {
 			sb.append("://");
 		}
 
-		// add www.yahoo, we don't check for the www or for a valid name
-		sb.append("www.yahoo.");
+		// 1 in 10 chance to not add the 'www'
+		if (rand.nextInt(10) != 0) {
+			sb.append("www.");
+		}
+
+		// pick a random name
+		sb.append(names[rand.nextInt(names.length)]);
 
 		// pick a random tld
 		sb.append(tlds[rand.nextInt(tlds.length)]);
@@ -188,7 +194,9 @@ public class UrlValidatorTest extends TestCase {
 			sb.append("all");
 		}
 
-		return sb.toString();
+		// return "http://www.yahoo.gov:31349";
+		return "https://www.google.edu?delete=all";
+		// return sb.toString();
 	}
 
 	/**
@@ -213,6 +221,7 @@ public class UrlValidatorTest extends TestCase {
 
 	/**
 	 * compare input auth in format "//www.yahoo.tld" against list of valid auths
+	 * one-character domain names and domains that start with a number are valid
 	 * @param auth
 	 * @return true if a match is found, else return false
 	 */
@@ -220,6 +229,14 @@ public class UrlValidatorTest extends TestCase {
 		// System.out.println(authority + ", " + authority.substring(0, 2) + ", " + authority.substring(2, authority.length()));
 		if (auth.substring(0, 2).equals("//")) {
 			String[] words = auth.substring(2, auth.length()).split("\\.");
+
+			if (words.length < 2) {
+				return false;
+			}
+			// this test makes sense, but I can't verify www.com is invalid
+			/*if (words.length == 2 && words[0].equals("www")) {
+			  return false;
+			  }*/
 			for (String a: VALID_TLDS) {
 				if (words[words.length-1].equals(a)) {
 					return true;
@@ -232,14 +249,16 @@ public class UrlValidatorTest extends TestCase {
 	//
 
 	/**
-	 * test whether input port is in range from 1024 - 49151. range from
-	 * http://www.ncftp.com/ncftpd/doc/misc/ephemeral_ports.html
-	 * @param port
-	 * @return true if in range, else return false
+	 * test whether input port is a number and is in range from 1024 - 49151.
+	 * range from http://www.ncftp.com/ncftpd/doc/misc/ephemeral_ports.html
+	 * @param rawPort
+	 * @return true if a number and in range, else return false
 	 */
-	public boolean isPortValid(int port) {
-		if (port >= 1024 && port <= 49151) {
-			return true;
+	public boolean isPortValid(String rawPort) {
+		if (rawPort.matches("\\d+")) {
+			if (Integer.parseInt(rawPort) >= 1024 && Integer.parseInt(rawPort) <= 49151) {
+				return true;
+			}
 		}
 		return false;
 	}
