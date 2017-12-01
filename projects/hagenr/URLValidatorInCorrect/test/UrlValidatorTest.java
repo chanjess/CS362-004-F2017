@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 /**
  * Performs Validation Test for url validations.
  *
- * @version $Revision: 1128446 $ $Date: 2011-05-27 13:29:27 -0700 (Fri, 27 May 2011) $
  */
 public class UrlValidatorTest extends TestCase {
 	private boolean printStatus = false;
@@ -33,7 +32,7 @@ public class UrlValidatorTest extends TestCase {
 	private static final String[] VALID_SCHEMES = {"http", "https", "ftp"};
 	private static final String[] VALID_TLDS = {"com", "gov", "edu", "org"};
 	private static final String URL_REGEX =    "^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?";
-	private static final int NUM_TESTS = 1;
+	private static final int NUM_TESTS = 1000;
 
 	private UrlValidatorTest(String testName) {
 		super(testName);
@@ -51,6 +50,12 @@ public class UrlValidatorTest extends TestCase {
 		urls.put("http://www.amazon.com:-1", false);
 		urls.put("http://www.amazon.com//contact", false);
 		urls.put("http://www.amazon.com/?action=delete", true);
+		urls.put("guitarcenter.com", true);
+		urls.put("www.washburn.com/", true);
+		urls.put("http://209.191.122.70/", true);
+		urls.put("htttp://www.amazon.com", false);
+		urls.put("http:/www.amazon.com", false);
+		urls.put("https://www.usajobs.gov/", true);
 
 		// test results
 		String[] results;
@@ -75,13 +80,84 @@ public class UrlValidatorTest extends TestCase {
 		}
 	}
 
-
-	public void testYourFirstPartition()
-	{
-
+	//scheme testing
+	public void testYourFirstPartition() {
+		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
+		System.out.println("Scheme Testing");
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com"));
+		//expectation: true
+		System.out.println(urlVal.isValid("https://www.google.com"));
+		//expectation: true
+		System.out.println(urlVal.isValid("https://www.google.com"));
+		//expectation: true
+		System.out.println(urlVal.isValid("www.google.com"));
+		//expectation: false
+		System.out.println(urlVal.isValid("hp.//www.google.com"));
+		//expectation: false
+		System.out.println(urlVal.isValid("htp://www.google.com"));
 	}
 
-	public void testYourSecondPartition(){
+	//Authority Testing
+	public void testYourSecondPartition() {
+		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
+		System.out.println("\nAuthority Testing");
+		//expectation: true
+		System.out.println(urlVal.isValid("google.com"));
+		//expectation: true
+		System.out.println(urlVal.isValid("google.mx"));
+		//expectation: true
+		System.out.println(urlVal.isValid("google.ca"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://255.255.255.255"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://255.255.255.255.255.255.255"));
+	}
+
+	//Post Testing
+	public void testYourThirdPartition() {
+		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
+		System.out.println("\nPort Testing");
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com:0"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com:65535"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com:-1"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com:f1"));
+	}
+
+	//Path Testing
+	public void testYourFourthPartition() {
+		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
+		System.out.println("\nPath Testing");
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com/test"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com/test/"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com/test/test"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com/.test"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com/////.test"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com/..test"));
+	}
+
+	//Query Testing
+	public void testYourFifthPartition() {
+		UrlValidator urlVal = new UrlValidator(null, null, UrlValidator.ALLOW_ALL_SCHEMES);
+		System.out.println("\nQuery Testing");
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com?action=view"));
+		//expectation: true
+		System.out.println(urlVal.isValid("http://www.google.com"));
+		//expectation: false
+		System.out.println(urlVal.isValid("http://www.google.com??????"));
 
 	}
 
@@ -195,8 +271,8 @@ public class UrlValidatorTest extends TestCase {
 		}
 
 		// return "http://www.yahoo.gov:31349";
-		return "https://www.google.edu?delete=all";
-		// return sb.toString();
+		// return "https://www.google.edu?delete=all";
+		return sb.toString();
 	}
 
 	/**
@@ -275,23 +351,24 @@ public class UrlValidatorTest extends TestCase {
 		return false;
 	}
 
-	public void testAnyOtherUnitTest()
-	{
-
-	}
-	/**
-	 * Create set of tests by taking the testUrlXXX arrays and
-	 * running through all possible permutations of their combinations.
-	 *
-	 * @param testObjects Used to create a url.
+	/*
+	 * calls the manual, partition, and program test cases
 	 */
-
 	public static void main(String[] args)
 	{
 		UrlValidatorTest mytest = new UrlValidatorTest("basic test");
-		// mytest.testManualTest();
+		System.out.println("URL Validator Test Suite with");
+		System.out.println("manual, partition, and program tests\nby Conner, Breedlove, and Hagen (respectively)\n");
+		System.out.println("------manual tests------");
+		mytest.testManualTest();
+		System.out.println("\n------partition tests------");
+		mytest.testYourFirstPartition();
+		mytest.testYourSecondPartition();
+		mytest.testYourThirdPartition();
+		mytest.testYourFourthPartition();
+		mytest.testYourFifthPartition();
+		System.out.println("\n------program tests------");
 		mytest.testIsValid();
 	}
 
 }
-
